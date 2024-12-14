@@ -31,7 +31,7 @@ namespace LibrarieOnline.Controllers
             {
                 var search = "";
                 ViewBag.Books = books;
-                int _perPage = 3;
+                int _perPage = 6;
                 int totalItems = books.Count();
                 if (TempData.ContainsKey("message"))
                 {
