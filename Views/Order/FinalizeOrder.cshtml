@@ -1,0 +1,49 @@
+﻿@model LibrarieOnline.Models.OrderModel
+
+@{
+    ViewBag.Title = "Finalizare comandă";
+}
+
+<h2>Finalizare comandă</h2>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-danger">@ViewBag.Message</div>
+}
+
+<div class="card mt-4">
+    <div class="card-body">
+        <h4 class="card-title">Detalii comandă</h4>
+        <p><strong>Total de plată:</strong> @Model.Total lei</p>
+        <p><strong>Status:</strong> @Model.Status</p>
+
+        <form asp-action="FinalizeOrder" asp-controller="Order" method="post" id="finalizeOrderForm">
+            <div class="form-group">
+                <label for="paymentType">Metoda de plată</label>
+                <select id="paymentType" name="PaymentType" class="form-control" required>
+                    <option value="Card">Card</option>
+                    <option value="Cash">Numerar</option>
+                    <option value="Transfer">Transfer bancar</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Adresa de livrare</label>
+                <textarea id="address" name="Address" class="form-control" rows="3" required placeholder="Introduceți adresa completă pentru livrare"></textarea>
+            </div>
+
+            <input type="hidden" name="CartID" value="@Model.CartID" />
+            <input type="hidden" name="Total" value="@Model.Total" />
+            <input type="hidden" name="Status" value="@Model.Status" />
+
+            <button type="button" class="btn btn-success mt-3" onclick="submitOrder()">Finalizează comanda</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function submitOrder() {
+        alert("Comanda a fost plasată cu succes!");
+        document.getElementById("finalizeOrderForm").submit();
+    }
+</script>

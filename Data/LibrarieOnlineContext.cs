@@ -46,13 +46,13 @@ namespace LibrarieOnline.Data
             modelBuilder.Entity<CommentModel>()
                 .HasOne(c => c.User)
                 .WithMany(u => u.Comments)
-                .HasForeignKey(c => c.UserID);
+                .HasForeignKey(c => c.UserId);
 
             // Relația 1 la 1 între Cart și User
             modelBuilder.Entity<CartModel>()
                 .HasOne(c => c.User)
                 .WithOne(u => u.Cart)
-                .HasForeignKey<CartModel>(c => c.UserID)
+                .HasForeignKey<CartModel>(c => c.UserId)
                 .OnDelete(DeleteBehavior.NoAction);  // Avoid cascade delete
 
             modelBuilder.Entity<OrderModel>()
@@ -79,7 +79,7 @@ namespace LibrarieOnline.Data
             modelBuilder.Entity<OrderModel>()
                 .HasOne(o => o.User)
                 .WithMany(u => u.Orders)
-                .HasForeignKey(o => o.UserID)
+                .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
 
@@ -87,7 +87,7 @@ namespace LibrarieOnline.Data
             modelBuilder.Entity<UserRewardModel>()
                 .HasOne(ur => ur.User)
                 .WithMany(u => u.UserRewards)
-                .HasForeignKey(ur => ur.UserID);
+                .HasForeignKey(ur => ur.UserId);
 
             // Relația între UserReward și Reward
             modelBuilder.Entity<UserRewardModel>()

@@ -1,0 +1,51 @@
+﻿@model IEnumerable<LibrarieOnline.Models.BookCartModel>
+
+@{
+    ViewBag.Title = "Cosul de cumparaturi";
+}
+
+<h2>Coș</h2>
+<br />
+@if (ViewBag.Message != null)
+{
+    <h2 class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>
+}
+
+@foreach (var cart in Model)
+{
+    <div class="card flex-row" style="height:30vh;overflow: auto;">
+        <img class="card-img-left card-img-responsive" src="@cart.Book.Image" alt="Poza" style="width:15vw">
+        <div class="card-body border">
+            <div><i class="bi bi-globe"></i> @cart.Book.Category.CategoryName</div>
+            <div class="d-flex justify-content-between flex-row">
+                <p class="card-text">@cart.Book.Title</p>
+                <p class="card-text">@cart.Book.Price lei</p>
+            </div>
+            <div class="d-flex justify-content-center flex-row mt-2 mb-2">
+                <a class="btn btn-primary" href="/BookCart/DecreaseQuantity?bookId=@cart.Book.BookID">-<i class="bi bi-dash"></i></a>
+                <p class="card-text m-2">@cart.Quantity</p>
+                <a class="btn btn-primary" href="/BookCart/IncreaseQuantity?bookId=@cart.Book.BookID">+<i class="bi bi-plus-lg"></i></a>
+            </div>
+
+            <div class="d-flex justify-content-between flex-row mt-2 mb-2">
+                <form asp-action="RemoveFromCart" asp-controller="BookCart" method="post" style="display:inline;">
+                    <input type="hidden" name="bookId" value="@cart.Book.BookID" />
+                    <button class="btn btn-danger" type="submit">Șterge carte din coș</button>
+                </form>
+                <a class="btn btn-primary" href="/Books/Show/@cart.Book.BookID">Afișare carte</a>
+            </div>
+
+        </div>
+    </div>
+    <br />
+}
+
+<div class="d-flex justify-content-between flex-row mt-2 mb-2">
+    <p class="card-text d-flex justify-content-center rounded px-2 py-1 bg-success text-light">@ViewBag.TotalPrice lei</p>
+    <a class="btn btn-outline-success" asp-controller="Order" asp-action="FinalizeOrder">
+        <i class="bi bi-send"></i> Finalizati Comanda
+    </a>
+</div>
+
+    </script>
+</div>

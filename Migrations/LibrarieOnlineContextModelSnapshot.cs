@@ -121,7 +121,7 @@ namespace LibrarieOnline.Migrations
 
                     b.HasIndex("CartID");
 
-                    b.ToTable("BookCarts");
+                    b.ToTable("BookCarts", (string)null);
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.BookModel", b =>
@@ -179,7 +179,7 @@ namespace LibrarieOnline.Migrations
 
                     b.HasIndex("CategoryID");
 
-                    b.ToTable("Books");
+                    b.ToTable("Books", (string)null);
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.CartModel", b =>
@@ -199,7 +199,7 @@ namespace LibrarieOnline.Migrations
                         .IsUnique()
                         .HasFilter("[UserID] IS NOT NULL");
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.CategoryModel", b =>
@@ -220,7 +220,7 @@ namespace LibrarieOnline.Migrations
 
                     b.HasKey("CategoryID");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.CommentModel", b =>
@@ -253,7 +253,7 @@ namespace LibrarieOnline.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.OrderModel", b =>
@@ -286,7 +286,7 @@ namespace LibrarieOnline.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.QuestionQuizModel", b =>
@@ -322,7 +322,7 @@ namespace LibrarieOnline.Migrations
 
                     b.HasIndex("QuizID");
 
-                    b.ToTable("QuestionQuizzes");
+                    b.ToTable("QuestionQuizzes", (string)null);
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.QuizModel", b =>
@@ -352,7 +352,7 @@ namespace LibrarieOnline.Migrations
 
                     b.HasIndex("RewardID");
 
-                    b.ToTable("Quizzes");
+                    b.ToTable("Quizzes", (string)null);
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.RewardModel", b =>
@@ -375,7 +375,7 @@ namespace LibrarieOnline.Migrations
 
                     b.HasKey("RewardID");
 
-                    b.ToTable("Rewards");
+                    b.ToTable("Rewards", (string)null);
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.UserRewardModel", b =>
@@ -401,7 +401,7 @@ namespace LibrarieOnline.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("UserRewards");
+                    b.ToTable("UserRewards", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

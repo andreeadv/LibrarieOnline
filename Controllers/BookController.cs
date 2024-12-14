@@ -40,7 +40,7 @@ namespace LibrarieOnline.Controllers
                 // Se preia pagina curenta din View-ul asociat
                 // Numarul paginii este valoarea parametrului page din ruta
                 // /Articles/Index?page=valoare
-               
+
 
                 // Pentru prima pagina offsetul o sa fie zero
                 // Pentru pagina 2 o sa fie 3 

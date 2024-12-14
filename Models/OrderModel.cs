@@ -6,7 +6,7 @@ namespace LibrarieOnline.Models
     {
         [Key]
         public int OrderID { get; set; }
-        public string? UserID { get; set; }
+        public string? UserId { get; set; }
         public int CartID { get; set; }
         public string? Status { get; set; }
         public string? PaymentType { get; set; }

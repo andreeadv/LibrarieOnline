@@ -1,136 +1,351 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿//using Microsoft.AspNetCore.Identity;
+//using Microsoft.AspNetCore.Mvc;
+//using Microsoft.EntityFrameworkCore;
+//using LibrarieOnline.Data;
+//using LibrarieOnline.Models;
+//using System.Linq;
+//using System.Threading.Tasks;
+
+//namespace LibrarieOnline.Controllers
+//{
+//    public class BookCartController : Controller
+//    {
+//        private readonly LibrarieOnlineContext _context;
+//        private readonly UserManager<ApplicationUser> _userManager;
+
+//        public BookCartController(LibrarieOnlineContext context, UserManager<ApplicationUser> userManager)
+//        {
+//            _context = context;
+//            _userManager = userManager;
+//        }
+
+//        // Adăugarea unei cărți în cos
+//        [HttpPost]
+//        public async Task<IActionResult> AddToCart(int bookId, int quantity)
+//        {
+//            var user = await _userManager.GetUserAsync(User);  // Obține utilizatorul curent
+
+//            if (user == null)
+//            {
+//                return RedirectToAction("Login", "Account");  // Dacă nu există utilizator, redirecționează la Login
+//            }
+
+//            // Căutăm cosul utilizatorului
+//            var cart = await _context.Carts
+//                                     .FirstOrDefaultAsync(c => c.UserID == user.UserID);
+
+//            // Dacă nu există cos pentru utilizator, creăm unul nou
+//            if (cart == null)
+//            {
+//                cart = new CartModel { UserID = user.UserID };
+//                _context.Carts.Add(cart);
+//                await _context.SaveChangesAsync();
+//            }
+
+//            // Căutăm dacă produsul este deja în cos
+//            var existingBookInCart = await _context.BookCarts
+//                                                    .FirstOrDefaultAsync(bc => bc.BookID == bookId && bc.CartID == cart.CartID);
+
+//            if (existingBookInCart != null)
+//            {
+//                // Dacă produsul există deja în cos, actualizăm cantitatea
+//                existingBookInCart.Quantity += quantity;
+//                _context.BookCarts.Update(existingBookInCart);
+//            }
+//            else
+//            {
+//                // Dacă produsul nu există în cos, adăugăm o nouă intrare în BookCart
+//                var bookCartItem = new BookCartModel
+//                {
+//                    BookID = bookId,
+//                    CartID = cart.CartID,
+//                    Quantity = quantity
+//                };
+//                _context.BookCarts.Add(bookCartItem);
+//            }
+
+//            // Salvăm modificările în baza de date
+//            await _context.SaveChangesAsync();
+
+//            return RedirectToAction("Index", "Cart");  // Redirecționăm către pagina cosului
+//        }
+
+//        // Actualizarea cantității unui produs din cos
+//        [HttpPost]
+//        public async Task<IActionResult> UpdateQuantity(int bookId, int quantity)
+//        {
+//            var user = await _userManager.GetUserAsync(User);
+
+//            if (user == null)
+//            {
+//                return RedirectToAction("Login", "Account");
+//            }
+
+//            var cart = await _context.Carts
+//                                     .FirstOrDefaultAsync(c => c.UserID == user.UserID);
+
+//            if (cart == null)
+//            {
+//                return RedirectToAction("Index", "Cart");
+//            }
+
+//            var bookCartItem = await _context.BookCarts
+//                                              .FirstOrDefaultAsync(bc => bc.BookID == bookId && bc.CartID == cart.CartID);
+
+//            if (bookCartItem != null)
+//            {
+//                bookCartItem.Quantity = quantity;
+//                _context.BookCarts.Update(bookCartItem);
+//                await _context.SaveChangesAsync();
+//            }
+
+//            return RedirectToAction("Index", "Cart");
+//        }
+
+//        // Eliminarea unui produs din cos
+//        [HttpPost]
+//        public async Task<IActionResult> RemoveFromCart(int bookId)
+//        {
+//            var user = await _userManager.GetUserAsync(User);
+
+//            if (user == null)
+//            {
+//                return RedirectToAction("Login", "Account");
+//            }
+
+//            var cart = await _context.Carts
+//                                     .FirstOrDefaultAsync(c => c.UserID == user.UserID);
+
+//            if (cart == null)
+//            {
+//                return RedirectToAction("Index", "Cart");
+//            }
+
+//            var bookCartItem = await _context.BookCarts
+//                                              .FirstOrDefaultAsync(bc => bc.BookID == bookId && bc.CartID == cart.CartID);
+
+//            if (bookCartItem != null)
+//            {
+//                _context.BookCarts.Remove(bookCartItem);
+//                await _context.SaveChangesAsync();
+//            }
+
+//            return RedirectToAction("Index", "Cart");
+//        }
+//    }
+//}
+
+
+
+
+
+
+
+
+/*
+ * ---------------------------------------------------------------------------
+ */
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using LibrarieOnline.Data;
-using LibrarieOnline.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using LibrarieOnline.Data;
+using LibrarieOnline.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace LibrarieOnline.Controllers
 {
+    [Authorize]
     public class BookCartController : Controller
     {
         private readonly LibrarieOnlineContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public BookCartController(LibrarieOnlineContext context, UserManager<ApplicationUser> userManager)
+        public BookCartController(LibrarieOnlineContext context)
         {
             _context = context;
-            _userManager = userManager;
         }
 
-        // Adăugarea unei cărți în cos
+        // Metoda pentru adăugarea unei cărți în coș
         [HttpPost]
-        public async Task<IActionResult> AddToCart(int bookId, int quantity)
+        public async Task<IActionResult> AddToCart(int bookId)
         {
-            var user = await _userManager.GetUserAsync(User);  // Obține utilizatorul curent
+            // Obține ID-ul utilizatorului curent
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (user == null)
+            if (userId == null)
             {
-                return RedirectToAction("Login", "Account");  // Dacă nu există utilizator, redirecționează la Login
+                return Unauthorized();
             }
 
-            // Căutăm cosul utilizatorului
-            var cart = await _context.Carts
-                                     .FirstOrDefaultAsync(c => c.UserID == user.UserID);
+            // Găsește coșul asociat utilizatorului
+            var cart = await _context.Carts.Include(c => c.BookCarts)
+                                           .FirstOrDefaultAsync(c => c.UserId == userId);
 
-            // Dacă nu există cos pentru utilizator, creăm unul nou
             if (cart == null)
             {
-                cart = new CartModel { UserID = user.UserID };
+                // Creează un coș nou dacă nu există
+                cart = new CartModel
+                {
+                    UserId = userId
+                };
+
                 _context.Carts.Add(cart);
                 await _context.SaveChangesAsync();
             }
 
-            // Căutăm dacă produsul este deja în cos
-            var existingBookInCart = await _context.BookCarts
-                                                    .FirstOrDefaultAsync(bc => bc.BookID == bookId && bc.CartID == cart.CartID);
-
-            if (existingBookInCart != null)
+            var book = await _context.Books.FirstOrDefaultAsync(b => b.BookID == bookId);
+            if (book == null)
             {
-                // Dacă produsul există deja în cos, actualizăm cantitatea
-                existingBookInCart.Quantity += quantity;
-                _context.BookCarts.Update(existingBookInCart);
+                return NotFound("Cartea nu a fost găsită.");
+            }
+
+            // Verifică dacă cartea este deja în coș
+            var bookCart = cart.BookCarts?.FirstOrDefault(bc => bc.BookID == bookId);
+            if (bookCart != null)
+            {
+                // Crește cantitatea dacă există deja
+                bookCart.Quantity++;
             }
             else
             {
-                // Dacă produsul nu există în cos, adăugăm o nouă intrare în BookCart
-                var bookCartItem = new BookCartModel
+                // Adaugă cartea în coș
+                bookCart = new BookCartModel
                 {
                     BookID = bookId,
                     CartID = cart.CartID,
-                    Quantity = quantity
+                    Quantity = 1
                 };
-                _context.BookCarts.Add(bookCartItem);
+
+                _context.BookCarts.Add(bookCart);
             }
 
-            // Salvăm modificările în baza de date
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index", "Cart");  // Redirecționăm către pagina cosului
+            Console.WriteLine($"Cartea '{book.Title}' a fost adăugată în coș.");
+
+            return RedirectToAction("Index", "Book");
         }
 
-        // Actualizarea cantității unui produs din cos
-        [HttpPost]
-        public async Task<IActionResult> UpdateQuantity(int bookId, int quantity)
+        // Metoda pentru afișarea coșului
+        public async Task<IActionResult> ViewCart()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (user == null)
+            if (userId == null)
             {
-                return RedirectToAction("Login", "Account");
+                return Unauthorized();
             }
 
-            var cart = await _context.Carts
-                                     .FirstOrDefaultAsync(c => c.UserID == user.UserID);
+            var cart = await _context.Carts.Include(c => c.BookCarts)
+                                           .ThenInclude(bc => bc.Book)
+                                           .ThenInclude(b => b.Category)
+                                           .FirstOrDefaultAsync(c => c.UserId == userId);
 
-            if (cart == null)
+            if (cart == null || cart.BookCarts == null || !cart.BookCarts.Any())
             {
-                return RedirectToAction("Index", "Cart");
+                ViewBag.Message = "Coșul este gol.";
+                return View(new List<BookCartModel>());
             }
 
-            var bookCartItem = await _context.BookCarts
-                                              .FirstOrDefaultAsync(bc => bc.BookID == bookId && bc.CartID == cart.CartID);
-
-            if (bookCartItem != null)
-            {
-                bookCartItem.Quantity = quantity;
-                _context.BookCarts.Update(bookCartItem);
-                await _context.SaveChangesAsync();
-            }
-
-            return RedirectToAction("Index", "Cart");
+            // Calculul prețului total
+            ViewBag.TotalPrice = cart.BookCarts.Sum(bc => bc.Book.Price * bc.Quantity);
+            return View(cart.BookCarts);
         }
 
-        // Eliminarea unui produs din cos
+        // Metoda pentru ștergerea unei cărți din coș
         [HttpPost]
         public async Task<IActionResult> RemoveFromCart(int bookId)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (user == null)
+            if (userId == null)
             {
-                return RedirectToAction("Login", "Account");
+                return Unauthorized();
             }
 
-            var cart = await _context.Carts
-                                     .FirstOrDefaultAsync(c => c.UserID == user.UserID);
+            var cart = await _context.Carts.Include(c => c.BookCarts)
+                                           .FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null)
             {
-                return RedirectToAction("Index", "Cart");
+                return NotFound();
             }
 
-            var bookCartItem = await _context.BookCarts
-                                              .FirstOrDefaultAsync(bc => bc.BookID == bookId && bc.CartID == cart.CartID);
-
-            if (bookCartItem != null)
+            var bookCart = cart.BookCarts?.FirstOrDefault(bc => bc.BookID == bookId);
+            if (bookCart != null)
             {
-                _context.BookCarts.Remove(bookCartItem);
+                _context.BookCarts.Remove(bookCart);
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Index", "Cart");
+            return RedirectToAction("ViewCart");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> IncreaseQuantity(int bookId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var cart = await _context.Carts.Include(c => c.BookCarts)
+                                           .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                return NotFound();
+            }
+
+            var bookCart = cart.BookCarts?.FirstOrDefault(bc => bc.BookID == bookId);
+            if (bookCart != null)
+            {
+                bookCart.Quantity++;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("ViewCart");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DecreaseQuantity(int bookId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var cart = await _context.Carts.Include(c => c.BookCarts)
+                                           .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                return NotFound();
+            }
+
+            var bookCart = cart.BookCarts?.FirstOrDefault(bc => bc.BookID == bookId);
+            if (bookCart != null)
+            {
+                if (bookCart.Quantity > 1)
+                {
+                    bookCart.Quantity--;
+                }
+                else
+                {
+                    _context.BookCarts.Remove(bookCart);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("ViewCart");
+        }
+
     }
 }

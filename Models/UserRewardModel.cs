@@ -6,7 +6,7 @@ namespace LibrarieOnline.Models
     {
         [Key]
         public int UserRewardID { get; set; }
-        public string? UserID { get; set; }
+        public string? UserId { get; set; }
         public int RewardID { get; set; }
         public DateTime ClaimedDate { get; set; }
 

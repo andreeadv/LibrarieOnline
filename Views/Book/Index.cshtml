@@ -29,13 +29,15 @@
                             <p class="fw-bold">Preț: @book.Price.ToString("C")</p>
                         </a>
                         <div class="second">
-                            <form method="post" action="/Carts/New/@book.BookID">
+                            <form asp-action="AddToCart" asp-controller="BookCart" method="post">
+                                <input type="hidden" name="bookId" value="@book.BookID" />
                                 <div style="text-align:center">
                                     <button class="btn btn-primary border rounded-pill border-blue" style="width:12rem;" type="submit">
                                         Adaugă în coș <i class="bi bi-cart"></i>
                                     </button>
                                 </div>
                             </form>
+
                         </div>
                     </div>
                 </div>

@@ -11,7 +11,7 @@ namespace LibrarieOnline.Models
         public DateTime Date { get; set; }
         public int Rating { get; set; }
         public int? BookID { get; set; }
-        public string? UserID { get; set; }
+        public string? UserId { get; set; }
 
         public virtual BookModel? Book { get; set; }
         public virtual ApplicationUser? User { get; set; }
