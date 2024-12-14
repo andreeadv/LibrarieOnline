@@ -1,45 +1,4 @@
-﻿//using LibrarieOnline.Data;
-//using LibrarieOnline.Models;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
-//using static System.Reflection.Metadata.BlobBuilder;
-
-//namespace LibrarieOnline.Controllers
-//{
-
-
-//        public class BookController(LibrarieOnlineContext context) : Controller
-//        {
-//            private readonly LibrarieOnlineContext _context = context;
-//            public List<BookModel>? Books { get; set; }
-//            public BookModel? CurrentBook { get; set; }
-
-//        [HttpGet]
-//            public IActionResult Index()
-//            {
-//                Books = _context.Books.Include(book => book.Category).ToList();
-//                if (Books == null)
-//                {
-//                    return RedirectToAction("Error", "Home");
-//                }
-//                return View(Books);
-//            }
-
-//            public IActionResult Book(int companieId)
-//            {
-//                CurrentBook = _context.Books
-//                    .Where(book => book.BookID == companieId).Include(book => book.Title).FirstOrDefault();
-//                if (CurrentBook == null)
-//                {
-//                    return RedirectToAction("Error", "Home");
-//                }
-//                return View(CurrentBook);
-//            }
-//        }
-//}
-
-
-
+﻿
 
 using LibrarieOnline.Data;
 using LibrarieOnline.Models;
