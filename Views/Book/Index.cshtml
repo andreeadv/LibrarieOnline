@@ -1,0 +1,75 @@
+﻿@model List<LibrarieOnline.Models.BookModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<br />
+
+@if (ViewBag.Message != null)
+{
+    <h2 class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>
+}
+
+<br />
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (LibrarieOnline.Models.BookModel book in ViewBag.Books)
+    {
+        if (book.Approved)
+        {
+            <div class="col">
+                <div class="card h-100" style="max-width: 16rem;">
+                    <div class="card-body">
+                        <a href="/Books/Show/@book.BookID">
+                            <img src="@book.Image" class="card-img-top" style="height:14rem;" alt="Poza" />
+                            <h5 class="card-title mt-2">@book.Title</h5>
+                            <p class="card-text">@book.Description.Substring(0, Math.Min(100, book.Description.Length))...</p>
+                            <p class="text-muted">Autor: @book.Author</p>
+                            <p class="fw-bold">Preț: @book.Price.ToString("C")</p>
+                        </a>
+                        <div class="second">
+                            <form method="post" action="/Carts/New/@book.BookID">
+                                <div style="text-align:center">
+                                    <button class="btn btn-primary border rounded-pill border-blue" style="width:12rem;" type="submit">
+                                        Adaugă în coș <i class="bi bi-cart"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<br />
+
+@* Afisarea paginată a articolelor *@
+<div>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link"
+                   href="/Book/Index?page=1" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            @for (int i = 1; i <= ViewBag.lastPage; i++)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       href="/Book/Index?page=@i">@(i)</a>
+                </li>
+            }
+
+            <li class="page-item">
+                <a class="page-link"
+                   href="/Books/Index?page=@(ViewBag.lastPage)" arialabel="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
