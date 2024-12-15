@@ -1,0 +1,32 @@
+﻿@model LibrarieOnline.Models.BookModel
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <img src="@Model.Image" class="card-img-top" style="max-height:300px; max-width:200px" alt="Poza">
+                <div class="card-body">
+                    <h1>@Model.Title</h1>
+                    <h4 class="text-muted">Autor: @Model.Author</h4>
+                    <h5>Category: @Model.Category?.CategoryName</h5>
+                    <p class="mt-3">@Model.Description</p>
+                    <p><strong>Price:</strong> @Model.Price lei</p>
+                    <p><strong>Published on:</strong> @Model.PublishedDate?.ToString("dd MMMM yyyy")</p>
+                </div>
+                <div class="card-footer text-center">
+                    <form asp-action="AddToCart" asp-controller="BookCart" method="post">
+                        <input type="hidden" name="bookId" value="@Model.BookID" />
+                        <button class="btn btn-primary">
+                            Adaugă în coș <i class="bi bi-cart"></i>
+                        </button>
+                    </form>
+                    <a asp-action="Index" class="btn btn-secondary mt-3">Înapoi la lista de cărți</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -21,7 +21,7 @@
             <div class="col">
                 <div class="card h-100" style="max-width: 16rem;">
                     <div class="card-body">
-                        <a href="/Books/Show/@book.BookID">
+                        <a asp-action="Book" asp-controller="Book" asp-route-bookId="@book.BookID">
                             <img src="@book.Image" class="card-img-top" style="height:14rem;" alt="Poza" />
                             <h5 class="card-title mt-2">@book.Title</h5>
                             <p class="card-text">@book.Description.Substring(0, Math.Min(100, book.Description.Length))...</p>

@@ -32,7 +32,7 @@
                     <input type="hidden" name="bookId" value="@cart.Book.BookID" />
                     <button class="btn btn-danger" type="submit">Șterge carte din coș</button>
                 </form>
-                <a class="btn btn-primary" href="/Books/Show/@cart.Book.BookID">Afișare carte</a>
+                <a class="btn btn-primary" asp-action="Book" asp-controller="Book" asp-route-bookId="@cart.Book.BookID">Afișare carte</a>
             </div>
 
         </div>

@@ -10,6 +10,7 @@ namespace LibrarieOnline.Controllers
     public class BookController : Controller
     {
         private readonly LibrarieOnlineContext _context;
+        public BookModel? CurrentBook { get; set; }
 
         // Constructorul
         public BookController(LibrarieOnlineContext context)
@@ -98,6 +99,17 @@ namespace LibrarieOnline.Controllers
                 return RedirectToAction("Error", "Home");
             }
             return View(book);
+        }
+
+        public IActionResult Book(int bookId)
+        {
+            CurrentBook = _context.Books
+                .Where(b => b.BookID == bookId).Include(b => b.Category).FirstOrDefault();
+            if (CurrentBook == null)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            return View(CurrentBook);
         }
     }
 }
