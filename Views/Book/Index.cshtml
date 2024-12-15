@@ -26,7 +26,7 @@
                             <h5 class="card-title mt-2">@book.Title</h5>
                             <p class="card-text">@book.Description.Substring(0, Math.Min(100, book.Description.Length))...</p>
                             <p class="text-muted">Autor: @book.Author</p>
-                            <p class="fw-bold">Preț: @book.Price.ToString("C")</p>
+                            <p class="fw-bold">Preț: @book.Price.ToString() lei</p>
                         </a>
                         <div class="second">
                             <form asp-action="AddToCart" asp-controller="BookCart" method="post">
