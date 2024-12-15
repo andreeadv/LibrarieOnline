@@ -4,6 +4,7 @@ using LibrarieOnline.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibrarieOnline.Migrations
 {
     [DbContext(typeof(LibrarieOnlineContext))]
-    partial class LibrarieOnlineContextModelSnapshot : ModelSnapshot
+    [Migration("20241215132226_RemovedID")]
+    partial class RemovedID
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
