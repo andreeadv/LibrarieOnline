@@ -128,7 +128,7 @@ namespace LibrarieOnline.Controllers
             */
 
             ViewBag.Message = "Comanda a fost plasată cu succes!";
-            return RedirectToAction("Index", "Books");
+            return RedirectToAction("Index", "Book");
         }
 
         /*
