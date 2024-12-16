@@ -4,6 +4,7 @@ using LibrarieOnline.Data;
 using LibrarieOnline.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -13,6 +14,8 @@ namespace LibrarieOnline.Controllers
     {
         private readonly LibrarieOnlineContext _context;
         public BookModel? CurrentBook { get; set; }
+
+        int pointsEarned = 0;
 
         // Constructorul
         public BookController(LibrarieOnlineContext context)
@@ -151,7 +154,15 @@ namespace LibrarieOnline.Controllers
             {
                 return Unauthorized("Trebuie să fii autentificat pentru a adăuga o recenzie.");
             }
-
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var reward = await _context.Rewards.FirstOrDefaultAsync(r => r.RewardID == 2);
+           
+            if (currentUser != null)
+            {
+                currentUser.Points += (int)reward.Points; // Adaugăm punctele la utilizator
+                _context.Users.Update(currentUser);
+                pointsEarned = (int)reward.Points;
+            }
             var review = new CommentModel
             {
                 BookID = bookId,
@@ -164,8 +175,8 @@ namespace LibrarieOnline.Controllers
             _context.Comments.Add(review);
             await _context.SaveChangesAsync();
 
-      
-            TempData["Message"] = "Recenzia a fost adăugată cu succes!";
+
+            TempData["Message"] = $"Comanda a fost plasată cu succes! Ați primit {pointsEarned} puncte.";
             return RedirectToAction("Book", "Book", new { bookId = bookId });
 
         }
