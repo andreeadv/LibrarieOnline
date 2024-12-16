@@ -1,6 +1,4 @@
-﻿
-
-using LibrarieOnline.Data;
+﻿using LibrarieOnline.Data;
 using LibrarieOnline.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +11,7 @@ namespace LibrarieOnline.Controllers
     {
         private readonly LibrarieOnlineContext _context;
         public BookModel? CurrentBook { get; set; }
+        int pointsEarned = 0; // Pentru punctele de recompensă
 
         // Constructorul
         public BookController(LibrarieOnlineContext context)
@@ -24,8 +23,9 @@ namespace LibrarieOnline.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var books = _context.Books.Include(book => book.Category).Include(b => b.Comments).ToList();
-            
+            var books = _context.Books.Include(b => b.Category).Include(b => b.Comments).AsQueryable();
+
+            // Calcularea ratingului mediu pentru fiecare carte
             foreach (var book in books)
             {
                 if (book.Comments != null && book.Comments.Any())
@@ -34,110 +34,102 @@ namespace LibrarieOnline.Controllers
                 }
                 else
                 {
-                    book.AvgRating = 0; // Fără rating
+                    book.AvgRating = 0;
                 }
             }
 
-            if (books == null || !books.Any())
+            // MOTOR DE CĂUTARE
+            var search = Convert.ToString(HttpContext.Request.Query["search"])?.Trim() ?? "";
+            if (!string.IsNullOrEmpty(search))
             {
-                ViewBag.Message = "Nu există cărți disponibile.";
-                ViewBag.Books = new List<BookModel>();
+                var bookIds = _context.Books.Where(b => b.Title.Contains(search) || b.Description.Contains(search))
+                    .Select(b => b.BookID).ToList();
+
+                var bookIdsFromComments = _context.Comments.Where(c => c.Content.Contains(search))
+                    .Select(c => c.BookID ?? 0).ToList();
+
+                var mergedBookIds = bookIds.Union(bookIdsFromComments).ToList();
+                books = books.Where(b => mergedBookIds.Contains(b.BookID));
             }
-            else
+
+            // FILTRARE
+            var author = Convert.ToString(HttpContext.Request.Query["author"])?.Trim();
+            if (!string.IsNullOrEmpty(author)) books = books.Where(b => b.Author.Contains(author));
+
+            var category = Convert.ToString(HttpContext.Request.Query["category"])?.Trim();
+            if (!string.IsNullOrEmpty(category)) books = books.Where(b => b.Category.CategoryName.Contains(category));
+
+            decimal? minPrice = null;
+            if (decimal.TryParse(Convert.ToString(HttpContext.Request.Query["minPrice"]), out var parsedMinPrice))
             {
-                var search = "";
-                ViewBag.Books = books;
-                int _perPage = 6;
-                int totalItems = books.Count();
-                if (TempData.ContainsKey("message"))
-                {
-                    ViewBag.message = TempData["message"].ToString();
-                }
-                // Se preia pagina curenta din View-ul asociat
-                // Numarul paginii este valoarea parametrului page din ruta
-                // /Articles/Index?page=valoare
-
-
-                // Pentru prima pagina offsetul o sa fie zero
-                // Pentru pagina 2 o sa fie 3 
-                // Asadar offsetul este egal cu numarul de articole 
-                // care au fost deja afisate pe paginile anterioare
-                var offset = 0;
-
-                // Se calculeaza offsetul in functie de numarul 
-                // paginii la care suntem
-
-                var currentPage = 1;
-                if (HttpContext.Request.Query.ContainsKey("page"))
-                {
-                    currentPage = Convert.ToInt32(HttpContext.Request.Query["page"]);
-                }
-
-
-                if (!currentPage.Equals(0))
-                {
-                    offset = (currentPage - 1) * _perPage;
-                }
-
-                var paginatedBooks = books.Skip(offset).Take(_perPage);
-
-                // Preluam numarul ultimei pagini
-
-                ViewBag.lastPage = Math.Ceiling((float)totalItems / (float)_perPage);
-
-                // Trimitem articolele cu ajutorul unui ViewBag catre View-ul corespunzator
-                ViewBag.Books = paginatedBooks;
-
-                if (search != "")
-                {
-                    ViewBag.PaginationBaseUrl = "/Books/Index/?search=" + search + "&page";
-                }
-                else
-                {
-                    ViewBag.PaginationBaseUrl = "/Books/Index/?page";
-                }
-
+                minPrice = parsedMinPrice;
+                books = books.Where(b => b.Price >= minPrice);
             }
+
+            decimal? maxPrice = null;
+            if (decimal.TryParse(Convert.ToString(HttpContext.Request.Query["maxPrice"]), out var parsedMaxPrice))
+            {
+                maxPrice = parsedMaxPrice;
+                books = books.Where(b => b.Price <= maxPrice);
+            }
+
+            // SORTARE
+            var sortBy = Convert.ToString(HttpContext.Request.Query["sortBy"]);
+            switch (sortBy)
+            {
+                case "price_asc": books = books.OrderBy(b => b.Price); break;
+                case "price_desc": books = books.OrderByDescending(b => b.Price); break;
+                case "title": books = books.OrderBy(b => b.Title); break;
+                case "author": books = books.OrderBy(b => b.Author); break;
+            }
+
+            // PAGINARE
+            int _perPage = 6;
+            int totalItems = books.Count();
+            var currentPage = HttpContext.Request.Query.ContainsKey("page") ? Convert.ToInt32(HttpContext.Request.Query["page"]) : 1;
+            var offset = (currentPage - 1) * _perPage;
+            var paginatedBooks = books.Skip(offset).Take(_perPage).ToList();
+
+            // ViewBag pentru View
+            ViewBag.Books = paginatedBooks;
+            ViewBag.SearchString = search;
+            ViewBag.Author = author;
+            ViewBag.Category = category;
+            ViewBag.MinPrice = minPrice;
+            ViewBag.MaxPrice = maxPrice;
+            ViewBag.SortBy = sortBy;
+            ViewBag.CurrentPage = currentPage;
+            ViewBag.LastPage = (int)Math.Ceiling((double)totalItems / _perPage);
+
+            var baseUrl = "/Book/Index/?";
+            if (!string.IsNullOrEmpty(search)) baseUrl += $"search={search}&";
+            if (!string.IsNullOrEmpty(author)) baseUrl += $"author={author}&";
+            if (!string.IsNullOrEmpty(category)) baseUrl += $"category={category}&";
+            if (minPrice.HasValue) baseUrl += $"minPrice={minPrice}&";
+            if (maxPrice.HasValue) baseUrl += $"maxPrice={maxPrice}&";
+            if (!string.IsNullOrEmpty(sortBy)) baseUrl += $"sortBy={sortBy}&";
+
+            ViewBag.PaginationBaseUrl = baseUrl + "page";
             return View();
         }
-
 
         // Detalii despre o anumită carte
         public IActionResult Details(int bookId)
         {
-            var book = _context.Books
-                .Include(b => b.Category) // Include relația cu Category
-                .FirstOrDefault(b => b.BookID == bookId);
-
-            if (book == null)
-            {
-                return RedirectToAction("Error", "Home");
-            }
+            var book = _context.Books.Include(b => b.Category).FirstOrDefault(b => b.BookID == bookId);
+            if (book == null) return RedirectToAction("Error", "Home");
             return View(book);
         }
 
         public IActionResult Book(int bookId)
         {
-            var book = _context.Books
-                               .Include(b => b.Category)
-                               .Include(b => b.Comments)
-                               .ThenInclude(c => c.User) 
-                               .FirstOrDefault(b => b.BookID == bookId);
+            var book = _context.Books.Include(b => b.Category)
+                .Include(b => b.Comments).ThenInclude(c => c.User)
+                .FirstOrDefault(b => b.BookID == bookId);
 
-            if (book == null)
-            {
-                return RedirectToAction("Error", "Home");
-            }
+            if (book == null) return RedirectToAction("Error", "Home");
 
-            if (book.Comments != null && book.Comments.Any())
-            {
-                book.AvgRating = (int)book.Comments.Average(c => c.Rating);
-            }
-            else
-            {
-                book.AvgRating = 0; // Dacă nu sunt comentarii, ratingul e 0
-            }
-
+            book.AvgRating = book.Comments?.Any() == true ? (int)book.Comments.Average(c => c.Rating) : 0;
             return View(book);
         }
 
@@ -146,10 +138,16 @@ namespace LibrarieOnline.Controllers
         public async Task<IActionResult> AddReview(int bookId, string content, int rating)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized("Trebuie să fii autentificat pentru a adăuga o recenzie.");
 
-            if (userId == null)
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var reward = await _context.Rewards.FirstOrDefaultAsync(r => r.RewardID == 2);
+
+            if (currentUser != null)
             {
-                return Unauthorized("Trebuie să fii autentificat pentru a adăuga o recenzie.");
+                currentUser.Points += (int)reward.Points;
+                _context.Users.Update(currentUser);
+                pointsEarned = (int)reward.Points;
             }
 
             var review = new CommentModel
@@ -164,11 +162,8 @@ namespace LibrarieOnline.Controllers
             _context.Comments.Add(review);
             await _context.SaveChangesAsync();
 
-      
-            TempData["Message"] = "Recenzia a fost adăugată cu succes!";
-            return RedirectToAction("Book", "Book", new { bookId = bookId });
-
+            TempData["Message"] = $"Recenzia a fost adăugată cu succes! Ați primit {pointsEarned} puncte.";
+            return RedirectToAction("Book", "Book", new { bookId });
         }
-
     }
 }
