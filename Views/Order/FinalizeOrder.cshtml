@@ -6,9 +6,11 @@
 
 <h2>Finalizare comandă</h2>
 
-@if (ViewBag.Message != null)
+@if (TempData["Message"] != null)
 {
-    <div class="alert alert-danger">@ViewBag.Message</div>
+    <div id="success-message" class="alert alert-success">
+        @TempData["Message"]
+    </div>
 }
 
 <div class="card mt-4">
