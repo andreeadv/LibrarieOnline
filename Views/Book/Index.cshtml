@@ -26,72 +26,117 @@
     });
 </script>
 
-<br />
-
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    @foreach (LibrarieOnline.Models.BookModel book in ViewBag.Books)
-    {
-        if (book.Approved)
-        {
-            <div class="col">
-                <div class="card h-100" style="max-width: 16rem;">
-                    <div class="card-body">
-                        <a asp-action="Book" asp-controller="Book" asp-route-bookId="@book.BookID">
-                            <img src="@book.Image" class="card-img-top" style="height:14rem;" alt="Poza" />
-                            <h5 class="card-title mt-2">@book.Title</h5>
-                            <p class="card-text">@book.Description.Substring(0, Math.Min(100, book.Description.Length))...</p>
-                            <p class="text-muted">Autor: @book.Author</p>
-                            <p class="fw-bold">Preț: @book.Price.ToString() lei</p>
-                            @if (book.AvgRating > 0)
-                            {
-                                <p><strong>Rating:</strong> @book.AvgRating.ToString("") / 5</p>
-                            }
-                            else
-                            {
-                                <p><strong>Rating:</strong> No ratings yet</p>
-                            }
-                        </a>
-                        <div class="second">
-                            <form asp-action="AddToCart" asp-controller="BookCart" method="post">
-                                <input type="hidden" name="bookId" value="@book.BookID" />
-                                <div style="text-align:center">
-                                    <button class="btn btn-primary border rounded-pill border-blue" style="width:12rem;" type="submit">
-                                        Adaugă în coș <i class="bi bi-cart"></i>
-                                    </button>
-                                </div>
-                            </form>
-
+<div class="container">
+    <div class="row">
+        <!-- Coloana pentru Filtre și Sortare (mai îngustă) -->
+        <div class="col-md-2">
+            <form method="GET" action="/Book/Index" class="mb-4">
+                <div class="d-flex flex-column gap-2">
+                    <!-- Dropdown pentru Sortare -->
+                    <div class="col-auto">
+                        <div class="dropdown">
+                            <button class="btn @(ViewBag.SortBy != null ? "btn-success" : "btn-outline-secondary") dropdown-toggle" type="button" id="dropdownSort" data-bs-toggle="dropdown" aria-expanded="false">
+                                Sortare
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownSort">
+                                <li>
+                                    <a class="dropdown-item @(ViewBag.SortBy == "price_asc" ? "active" : "")" href="?sortBy=price_asc&author=@ViewBag.Author&category=@ViewBag.Category&minPrice=@ViewBag.MinPrice&maxPrice=@ViewBag.MaxPrice">Preț crescător</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item @(ViewBag.SortBy == "price_desc" ? "active" : "")" href="?sortBy=price_desc&author=@ViewBag.Author&category=@ViewBag.Category&minPrice=@ViewBag.MinPrice&maxPrice=@ViewBag.MaxPrice">Preț descrescător</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
+
+                    <!-- Autor -->
+                    <div>
+                        <label class="form-label fw-bold">Autor</label>
+                        <input type="text" name="author" class="form-control form-control-sm" placeholder="Autor" value="@ViewBag.Author" />
+                    </div>
+
+                    <!-- Categorie -->
+                    <div>
+                        <label class="form-label fw-bold">Categorie</label>
+                        <input type="text" name="category" class="form-control form-control-sm" placeholder="Categorie" value="@ViewBag.Category" />
+                    </div>
+
+                    <!-- Preț Minim -->
+                    <div>
+                        <label class="form-label fw-bold">Preț Minim</label>
+                        <input type="number" name="minPrice" class="form-control form-control-sm" placeholder="Min" value="@ViewBag.MinPrice" />
+                    </div>
+
+                    <!-- Preț Maxim -->
+                    <div>
+                        <label class="form-label fw-bold">Preț Maxim</label>
+                        <input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="Max" value="@ViewBag.MaxPrice" />
+                    </div>
+
+                    <!-- Butoane Aplică Filtrele și Resetare -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-sm">Aplică filtre</button>
+                        <a href="/Book/Index" class="btn btn-outline-secondary btn-sm">Resetează filtre</a>
+                    </div>
                 </div>
+            </form>
+        </div>
+
+        <!-- Coloana pentru Lista de Cărți -->
+        <div class="col-md-10">
+            <div class="row row-cols-2 row-cols-md-4 g-2">
+                @foreach (var book in ViewBag.Books)
+                {
+                    if (book.Approved)
+                    {
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="card-body p-2">
+                                    <a asp-action="Book" asp-controller="Book" asp-route-bookId="@book.BookID" class="text-decoration-none">
+                                        <img src="@book.Image" class="card-img-top" style="height:12rem;" alt="Poza" />
+                                        <h6 class="card-title mt-2 mb-1 text-dark">@book.Title</h6>
+                                        <p class="text-muted mb-1 small">Autor: @book.Author</p>
+                                        <p class="fw-bold mb-1 small">Preț: @book.Price lei</p>
+                                        @if (book.AvgRating > 0)
+                                        {
+                                            <p class="small mb-0"><strong>Rating:</strong> @book.AvgRating / 5</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="small mb-0"><strong>Rating:</strong> No ratings yet</p>
+                                        }
+                                    </a>
+                                    <form asp-action="AddToCart" asp-controller="BookCart" method="post" class="mt-2">
+                                        <input type="hidden" name="bookId" value="@book.BookID" />
+                                        <button class="btn btn-primary btn-sm w-100">Adaugă în coș <i class="bi bi-cart"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
             </div>
-        }
-    }
+        </div>
+    </div>
 </div>
 
-<br />
-
-@* Afisarea paginată a articolelor *@
+<!-- Paginare -->
 <div>
     <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item">
-                <a class="page-link"
-                   href="/Book/Index?page=1" aria-label="Previous">
+        <ul class="pagination justify-content-center mt-4">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@($"{ViewBag.PaginationBaseUrl}={(ViewBag.CurrentPage - 1)}")" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
-            @for (int i = 1; i <= ViewBag.lastPage; i++)
+            @for (int i = 1; i <= ViewBag.LastPage; i++)
             {
-                <li class="page-item">
-                    <a class="page-link"
-                       href="/Book/Index?page=@i">@(i)</a>
+                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                    <a class="page-link" href="@($"{ViewBag.PaginationBaseUrl}={i}")">@i</a>
                 </li>
             }
-
-            <li class="page-item">
-                <a class="page-link"
-                   href="/Books/Index?page=@(ViewBag.lastPage)" arialabel="Next">
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.LastPage ? "disabled" : "")">
+                <a class="page-link" href="@($"{ViewBag.PaginationBaseUrl}={(ViewBag.CurrentPage + 1)}")" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
