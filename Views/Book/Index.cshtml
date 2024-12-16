@@ -27,15 +27,58 @@
 </script>
 
 <br />
+<!-- carusel de imagini, swipe autopat cu pauza la hover -->
+<div id="homepageCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="10000" data-bs-pause="hover">
+    <!-- Indicatori -->
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#homepageCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#homepageCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      
+    </div>
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
+    <!-- Imagini -->
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="/images/welcome.png" class="d-block w-100" alt="First slide">
+        </div>
+        <div class="carousel-item">
+            <img src="/images/rewardmessage.png" class="d-block w-100" alt="Second slide">
+        </div>
+    </div>
+
+    <!-- Butoane de navigare -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#homepageCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#homepageCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Selectează caruselul
+        var carousel = document.querySelector('#homepageCarousel');
+        var carouselInstance = bootstrap.Carousel.getOrCreateInstance(carousel);
+
+        // Setează intervalul la 10 secunde
+        carouselInstance._config.interval = 10000;
+
+        // Pornește rularea automată
+        carouselInstance.cycle();
+    });
+</script>
+
+<div class="row row-cols-1 row-cols-md-4 g-4" style ="margin-top: 50px">
     @foreach (LibrarieOnline.Models.BookModel book in ViewBag.Books)
     {
         if (book.Approved)
         {
             <div class="col">
                 <div class="card h-100" style="max-width: 16rem;">
-                    <div class="card-body">
+                    <div class="card-body" style="box-shadow: 0 0 25px 10px #ADD8E6; position: relative;">
                         <a asp-action="Book" asp-controller="Book" asp-route-bookId="@book.BookID">
                             <img src="@book.Image" class="card-img-top" style="height:14rem;" alt="Poza" />
                             <h5 class="card-title mt-2">@book.Title</h5>
