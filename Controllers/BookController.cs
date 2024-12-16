@@ -13,6 +13,8 @@ namespace LibrarieOnline.Controllers
         public BookModel? CurrentBook { get; set; }
         int pointsEarned = 0; // Pentru punctele de recompensă
 
+        int pointsEarned = 0;
+
         // Constructorul
         public BookController(LibrarieOnlineContext context)
         {
@@ -20,7 +22,7 @@ namespace LibrarieOnline.Controllers
         }
         //sdfk
 
-        // Afișarea tuturor cărților
+        // Afișarea tuturor cărților (combinată)
         [HttpGet]
         public IActionResult Index()
         {
@@ -140,6 +142,16 @@ namespace LibrarieOnline.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized("Trebuie să fii autentificat pentru a adăuga o recenzie.");
+
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var reward = await _context.Rewards.FirstOrDefaultAsync(r => r.RewardID == 2);
+
+            if (currentUser != null)
+            {
+                currentUser.Points += (int)reward.Points;
+                _context.Users.Update(currentUser);
+                pointsEarned = (int)reward.Points;
+            }
 
             var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             var reward = await _context.Rewards.FirstOrDefaultAsync(r => r.RewardID == 2);
