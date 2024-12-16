@@ -20,6 +20,64 @@
         <p><strong>Status:</strong> @Model.Status</p>
 
         <form asp-action="FinalizeOrder" asp-controller="Order" method="post" id="finalizeOrderForm">
+            @* Verificare si afisare sau input pentru Nume *@
+            <div class="form-group">
+                <label for="lastName">Nume</label>
+                @if (Model.User != null && !string.IsNullOrEmpty(Model.User.LastName))
+                {
+                    <p>@Model.User.LastName</p>
+                    <input type="hidden" name="LastName" value="@Model.User.LastName" />
+                }
+                else
+                {
+                    <input type="text" id="lastName" name="LastName" class="form-control" placeholder="Introduceți numele" required />
+                }
+            </div>
+
+            @* Verificare si afisare sau input pentru Prenume *@
+            <div class="form-group">
+                <label for="firstName">Prenume</label>
+                @if (Model.User != null && !string.IsNullOrEmpty(Model.User.FirstName))
+                {
+                    <p>@Model.User.FirstName</p>
+                    <input type="hidden" name="FirstName" value="@Model.User.FirstName" />
+                }
+                else
+                {
+                    <input type="text" id="firstName" name="FirstName" class="form-control" placeholder="Introduceți prenumele" required />
+                }
+            </div>
+
+            @* Verificare si afisare sau input pentru Număr de telefon *@
+            <div class="form-group">
+                <label for="phoneNumber">Număr de telefon</label>
+                @if (Model.User != null && !string.IsNullOrEmpty(Model.User.PhoneNumber))
+                {
+                    <p>@Model.User.PhoneNumber</p>
+                    <input type="hidden" name="PhoneNumber" value="@Model.User.PhoneNumber" />
+                }
+                else
+                {
+                    <input type="text" id="phoneNumber" name="PhoneNumber" class="form-control" placeholder="Introduceți numărul de telefon" required />
+                }
+            </div>
+
+            @* Verificare si afisare sau input pentru Adresa de email *@
+            <div class="form-group">
+                <label for="email">Adresa de email</label>
+                @if (Model.User != null && !string.IsNullOrEmpty(Model.User.Email))
+                {
+                    <p>@Model.User.Email</p>
+                    <input type="hidden" name="Email" value="@Model.User.Email" />
+                }
+                else
+                {
+                    <input type="email" id="email" name="Email" class="form-control" placeholder="Introduceți adresa de email" required />
+                }
+            </div>
+
+           
+
             <div class="form-group">
                 <label for="paymentType">Metoda de plată</label>
                 <select id="paymentType" name="PaymentType" class="form-control" required onchange="updatePaymentDetails()">
@@ -63,7 +121,7 @@
             <input type="hidden" name="Total" value="@Model.Total" />
             <input type="hidden" name="Status" value="@Model.Status" />
 
-            <button type="button" class="btn btn-success mt-3" onclick="submitOrder()">Finalizează comanda</button>
+            <button type="submit" class="btn btn-success mt-3">Finalizează comanda</button>
         </form>
     </div>
 </div>
@@ -80,10 +138,5 @@
         } else if (paymentType === "Transfer") {
             document.getElementById("paymentDetailsTransfer").classList.remove("d-none");
         }
-    }
-
-    function submitOrder() {
-        alert("Comanda a fost plasată cu succes!");
-        document.getElementById("finalizeOrderForm").submit();
     }
 </script>
