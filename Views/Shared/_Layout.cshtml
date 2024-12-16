@@ -102,9 +102,31 @@
             </div>
         </div>
     </footer>
+    <button id="scrollToTopBtn" class="btn btn-primary" onclick="scrollToTop()" style="position: fixed; bottom: 20px; right: 20px;">
+        <i class="bi bi-arrow-up"></i>
+    </button>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Function to scroll to the top
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Show button when scrolling down
+        window.onscroll = function () {
+            var button = document.getElementById("scrollToTopBtn");
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                button.style.display = "block";
+            } else {
+                button.style.display = "none";
+            }
+        };
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
