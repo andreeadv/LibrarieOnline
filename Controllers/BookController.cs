@@ -2,8 +2,10 @@
 
 using LibrarieOnline.Data;
 using LibrarieOnline.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace LibrarieOnline.Controllers
 {
@@ -22,7 +24,20 @@ namespace LibrarieOnline.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var books = _context.Books.Include(book => book.Category).ToList();
+            var books = _context.Books.Include(book => book.Category).Include(b => b.Comments).ToList();
+            
+            foreach (var book in books)
+            {
+                if (book.Comments != null && book.Comments.Any())
+                {
+                    book.AvgRating = (int)book.Comments.Average(c => c.Rating);
+                }
+                else
+                {
+                    book.AvgRating = 0; // Fără rating
+                }
+            }
+
             if (books == null || !books.Any())
             {
                 ViewBag.Message = "Nu există cărți disponibile.";
@@ -103,13 +118,57 @@ namespace LibrarieOnline.Controllers
 
         public IActionResult Book(int bookId)
         {
-            CurrentBook = _context.Books
-                .Where(b => b.BookID == bookId).Include(b => b.Category).FirstOrDefault();
-            if (CurrentBook == null)
+            var book = _context.Books
+                               .Include(b => b.Category)
+                               .Include(b => b.Comments)
+                               .ThenInclude(c => c.User) 
+                               .FirstOrDefault(b => b.BookID == bookId);
+
+            if (book == null)
             {
                 return RedirectToAction("Error", "Home");
             }
-            return View(CurrentBook);
+
+            if (book.Comments != null && book.Comments.Any())
+            {
+                book.AvgRating = (int)book.Comments.Average(c => c.Rating);
+            }
+            else
+            {
+                book.AvgRating = 0; // Dacă nu sunt comentarii, ratingul e 0
+            }
+
+            return View(book);
         }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AddReview(int bookId, string content, int rating)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Unauthorized("Trebuie să fii autentificat pentru a adăuga o recenzie.");
+            }
+
+            var review = new CommentModel
+            {
+                BookID = bookId,
+                UserId = userId,
+                Content = content,
+                Rating = rating,
+                Date = DateTime.Now
+            };
+
+            _context.Comments.Add(review);
+            await _context.SaveChangesAsync();
+
+      
+            TempData["Message"] = "Recenzia a fost adăugată cu succes!";
+            return RedirectToAction("Book", "Book", new { bookId = bookId });
+
+        }
+
     }
 }

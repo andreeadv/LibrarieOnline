@@ -20,11 +20,36 @@
         <form asp-action="FinalizeOrder" asp-controller="Order" method="post" id="finalizeOrderForm">
             <div class="form-group">
                 <label for="paymentType">Metoda de plată</label>
-                <select id="paymentType" name="PaymentType" class="form-control" required>
+                <select id="paymentType" name="PaymentType" class="form-control" required onchange="updatePaymentDetails()">
+                    <option value="Cash" selected>Numerar</option>
                     <option value="Card">Card</option>
-                    <option value="Cash">Numerar</option>
                     <option value="Transfer">Transfer bancar</option>
                 </select>
+            </div>
+
+            <div id="paymentDetailsCard" class="form-group d-none">
+                <label for="cardNumber">Număr card</label>
+                <input type="text" id="cardNumber" name="CardNumber" class="form-control" placeholder="Introduceți numărul cardului" />
+
+                <label for="cardHolder">Nume titular card</label>
+                <input type="text" id="cardHolder" name="CardHolder" class="form-control" placeholder="Introduceți numele titularului cardului" />
+
+                <label for="cardExpiration">Dată expirare</label>
+                <input type="text" id="cardExpiration" name="CardExpiration" class="form-control" placeholder="MM/AA" />
+
+                <label for="cardCVV">Cod CVV</label>
+                <input type="text" id="cardCVV" name="CardCVV" class="form-control" placeholder="Introduceți codul CVV" />
+            </div>
+
+            <div id="paymentDetailsTransfer" class="form-group d-none">
+                <label for="bankName">Nume bancă</label>
+                <input type="text" id="bankName" name="BankName" class="form-control" placeholder="Introduceți numele băncii" />
+
+                <label for="accountNumber">Număr cont</label>
+                <input type="text" id="accountNumber" name="AccountNumber" class="form-control" placeholder="Introduceți numărul contului" />
+
+                <label for="iban">IBAN</label>
+                <input type="text" id="iban" name="IBAN" class="form-control" placeholder="Introduceți IBAN-ul" />
             </div>
 
             <div class="form-group">
@@ -42,6 +67,19 @@
 </div>
 
 <script>
+    function updatePaymentDetails() {
+        const paymentType = document.getElementById("paymentType").value;
+
+        document.getElementById("paymentDetailsCard").classList.add("d-none");
+        document.getElementById("paymentDetailsTransfer").classList.add("d-none");
+
+        if (paymentType === "Card") {
+            document.getElementById("paymentDetailsCard").classList.remove("d-none");
+        } else if (paymentType === "Transfer") {
+            document.getElementById("paymentDetailsTransfer").classList.remove("d-none");
+        }
+    }
+
     function submitOrder() {
         alert("Comanda a fost plasată cu succes!");
         document.getElementById("finalizeOrderForm").submit();
