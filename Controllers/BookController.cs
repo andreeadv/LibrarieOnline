@@ -13,14 +13,13 @@ namespace LibrarieOnline.Controllers
         public BookModel? CurrentBook { get; set; }
         int pointsEarned = 0; // Pentru punctele de recompensă
 
-        int pointsEarned = 0;
 
         // Constructorul
         public BookController(LibrarieOnlineContext context)
         {
             _context = context;
         }
-        //sdfk
+   
 
         // Afișarea tuturor cărților (combinată)
         [HttpGet]
@@ -87,7 +86,7 @@ namespace LibrarieOnline.Controllers
             }
 
             // PAGINARE
-            int _perPage = 6;
+            int _perPage = 8;
             int totalItems = books.Count();
             var currentPage = HttpContext.Request.Query.ContainsKey("page") ? Convert.ToInt32(HttpContext.Request.Query["page"]) : 1;
             var offset = (currentPage - 1) * _perPage;
@@ -152,9 +151,6 @@ namespace LibrarieOnline.Controllers
                 _context.Users.Update(currentUser);
                 pointsEarned = (int)reward.Points;
             }
-
-            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            var reward = await _context.Rewards.FirstOrDefaultAsync(r => r.RewardID == 2);
 
             if (currentUser != null)
             {
