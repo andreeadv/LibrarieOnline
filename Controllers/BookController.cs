@@ -12,15 +12,16 @@ namespace LibrarieOnline.Controllers
         private readonly LibrarieOnlineContext _context;
         public BookModel? CurrentBook { get; set; }
 
+        int pointsEarned = 0;
+
         // Constructorul
         public BookController(LibrarieOnlineContext context)
         {
             _context = context;
         }
 
-        // Afișarea tuturor cărților
+        // Afișarea tuturor cărților (combinată)
         [HttpGet]
-
         public IActionResult Index()
         {
             var books = _context.Books.Include(b => b.Category).Include(b => b.Comments).AsQueryable();
@@ -42,15 +43,12 @@ namespace LibrarieOnline.Controllers
             var search = Convert.ToString(HttpContext.Request.Query["search"])?.Trim() ?? "";
             if (!string.IsNullOrEmpty(search))
             {
-                // Căutare în titlu, descriere și comentarii
                 var bookIds = _context.Books.Where(
                     b => b.Title.Contains(search) || b.Description.Contains(search))
-                    .Select(b => b.BookID)
-                    .ToList();
+                    .Select(b => b.BookID).ToList();
 
                 var bookIdsFromComments = _context.Comments.Where(c => c.Content.Contains(search))
-                    .Select(c => c.BookID ?? 0)
-                    .ToList();
+                    .Select(c => c.BookID ?? 0).ToList();
 
                 var mergedBookIds = bookIds.Union(bookIdsFromComments).ToList();
                 books = books.Where(b => mergedBookIds.Contains(b.BookID));
@@ -125,7 +123,6 @@ namespace LibrarieOnline.Controllers
             ViewBag.CurrentPage = currentPage;
             ViewBag.LastPage = (int)Math.Ceiling((double)totalItems / _perPage);
 
-            // URL pentru paginație
             var baseUrl = "/Book/Index/?";
             if (!string.IsNullOrEmpty(search)) baseUrl += $"search={search}&";
             if (!string.IsNullOrEmpty(author)) baseUrl += $"author={author}&";
@@ -139,7 +136,7 @@ namespace LibrarieOnline.Controllers
             return View();
         }
 
-        // Detalii despre o anumită carte
+        // Detalii despre o carte
         public IActionResult Details(int bookId)
         {
             var book = _context.Books
@@ -172,7 +169,7 @@ namespace LibrarieOnline.Controllers
             }
             else
             {
-                book.AvgRating = 0; // Dacă nu sunt comentarii, ratingul e 0
+                book.AvgRating = 0;
             }
 
             return View(book);
@@ -189,6 +186,16 @@ namespace LibrarieOnline.Controllers
                 return Unauthorized("Trebuie să fii autentificat pentru a adăuga o recenzie.");
             }
 
+            var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var reward = await _context.Rewards.FirstOrDefaultAsync(r => r.RewardID == 2);
+
+            if (currentUser != null)
+            {
+                currentUser.Points += (int)reward.Points;
+                _context.Users.Update(currentUser);
+                pointsEarned = (int)reward.Points;
+            }
+
             var review = new CommentModel
             {
                 BookID = bookId,
@@ -201,7 +208,7 @@ namespace LibrarieOnline.Controllers
             _context.Comments.Add(review);
             await _context.SaveChangesAsync();
 
-            TempData["Message"] = "Recenzia a fost adăugată cu succes!";
+            TempData["Message"] = $"Comanda a fost plasată cu succes! Ați primit {pointsEarned} puncte.";
             return RedirectToAction("Book", "Book", new { bookId = bookId });
         }
     }
