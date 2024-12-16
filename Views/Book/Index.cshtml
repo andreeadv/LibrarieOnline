@@ -8,8 +8,23 @@
 
 @if (ViewBag.Message != null)
 {
-    <h2 class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>
+    <h2 id="success-message" class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>
 }
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+            var messageDiv = document.getElementById('success-message');
+            if (messageDiv) {
+                messageDiv.style.transition = "opacity 0.5s ease";
+                messageDiv.style.opacity = 0;
+                setTimeout(function () {
+                    messageDiv.remove();
+                }, 500);
+            }
+        }, 4000);
+    });
+</script>
 
 <br />
 

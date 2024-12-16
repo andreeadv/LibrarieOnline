@@ -15,7 +15,7 @@ namespace LibrarieOnline.Controllers
     public class OrderController : Controller
     {
         private readonly LibrarieOnlineContext _context;
-
+        int pointsEarned = 0; // Variabilă pentru punctele câștigate
         public OrderController(LibrarieOnlineContext context)
         {
             _context = context;
@@ -101,6 +101,7 @@ namespace LibrarieOnline.Controllers
                 if (currentUser != null)
                 {
                     currentUser.Points += (int)reward.Points; // Adaugăm punctele la utilizator
+                    pointsEarned = (int)reward.Points;
                     _context.Users.Update(currentUser);
                 }
 
@@ -127,7 +128,8 @@ namespace LibrarieOnline.Controllers
             }
             */
 
-            ViewBag.Message = "Comanda a fost plasată cu succes!";
+            TempData["Message"] = $"Comanda a fost plasată cu succes! Ați primit {pointsEarned} puncte.";
+            ViewBag.Message = TempData["Message"];
             return RedirectToAction("Index", "Book");
         }
 
