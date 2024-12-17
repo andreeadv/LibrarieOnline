@@ -121,7 +121,7 @@
             <input type="hidden" name="Total" value="@Model.Total" />
             <input type="hidden" name="Status" value="@Model.Status" />
 
-            <button type="submit" class="btn btn-success mt-3">Finalizează comanda</button>
+            <button type="button" class="btn btn-success mt-3" onclick="submitOrder()">Finalizează comanda</button>
         </form>
     </div>
 </div>
@@ -138,5 +138,9 @@
         } else if (paymentType === "Transfer") {
             document.getElementById("paymentDetailsTransfer").classList.remove("d-none");
         }
+    }
+        function submitOrder() {
+        alert("Comanda a fost plasată cu succes!");
+        document.getElementById("finalizeOrderForm").submit();
     }
 </script>
