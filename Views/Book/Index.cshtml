@@ -10,6 +10,19 @@
 {
     <h2 id="success-message" class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>
 }
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success text-center">
+        @TempData["Message"]
+    </div>
+}
+
+@* @if (TempData["Message"] != null) *@
+@* { *@
+@*     <script> *@
+@*         alert("@TempData["Message"]"); *@
+@*     </script> *@
+@* } *@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
