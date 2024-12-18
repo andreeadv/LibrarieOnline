@@ -12,17 +12,10 @@
 }
 @if (TempData["Message"] != null)
 {
-    <div class="alert alert-success text-center">
+    <div id="success-message" class="alert alert-success text-center">
         @TempData["Message"]
     </div>
 }
-
-@* @if (TempData["Message"] != null) *@
-@* { *@
-@*     <script> *@
-@*         alert("@TempData["Message"]"); *@
-@*     </script> *@
-@* } *@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
