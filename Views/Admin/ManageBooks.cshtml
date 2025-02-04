@@ -1,0 +1,31 @@
+﻿@model List<LibrarieOnline.Models.BookModel>
+
+<div class="container mt-4">
+    <h2 class="text-center">📖 Gestionare Cărți</h2>
+    <a class="btn btn-success mb-3" asp-action="CreateBook">➕ Adaugă Carte</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Titlu</th>
+                <th>Autor</th>
+                <th>Preț</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in Model)
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>@book.Author</td>
+                    <td>@book.Price lei</td>
+                    <td>
+                        <a class="btn btn-warning btn-sm" asp-action="EditBook" asp-route-id="@book.BookID">✏️ Editare</a>
+                        <a class="btn btn-danger btn-sm" asp-action="DeleteBook" asp-route-id="@book.BookID">🗑️ Ștergere</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

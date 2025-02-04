@@ -152,13 +152,6 @@ namespace LibrarieOnline.Controllers
                 pointsEarned = (int)reward.Points;
             }
 
-            if (currentUser != null)
-            {
-                currentUser.Points += (int)reward.Points;
-                _context.Users.Update(currentUser);
-                pointsEarned = (int)reward.Points;
-            }
-
             var review = new CommentModel
             {
                 BookID = bookId,

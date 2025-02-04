@@ -1,0 +1,29 @@
+﻿@model List<LibrarieOnline.Models.QuizModel>
+
+<div class="container mt-4">
+    <h2 class="text-center">📚 Gestionare Quiz-uri</h2>
+    <a class="btn btn-success mb-3" asp-action="CreateQuiz">➕ Adaugă Quiz</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Întrebare</th>
+                <th>Scor</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var quiz in Model)
+            {
+                <tr>
+                    <td>@quiz.Question</td>
+                    <td>@quiz.Score</td>
+                    <td>
+                        <a class="btn btn-warning btn-sm" asp-action="EditQuiz" asp-route-id="@quiz.QuizID">✏️ Editare</a>
+                        <a class="btn btn-danger btn-sm" asp-action="DeleteQuiz" asp-route-id="@quiz.QuizID">🗑️ Ștergere</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

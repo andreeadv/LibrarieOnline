@@ -128,6 +128,7 @@ namespace LibrarieOnline.Controllers
             }
             */
 
+            //ViewBag.Message = "Comanda a fost plasată cu succes!";
             TempData["Message"] = $"Comanda a fost plasată cu succes! Ați primit {pointsEarned} puncte.";
             ViewBag.Message = TempData["Message"];
             return RedirectToAction("Index", "Book");

@@ -15,6 +15,17 @@
 </head>
 <body>
     <header>
+        @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+        @{
+            var lastAttempt = HttpContextAccessor.HttpContext.Session.GetString("LastQuizAttempt");
+            bool showQuizButton = User.Identity.IsAuthenticated; // Afișăm doar dacă utilizatorul este conectat
+
+            if (showQuizButton && !string.IsNullOrEmpty(lastAttempt) && DateTime.TryParse(lastAttempt, out DateTime lastAttemptTime))
+            {
+                showQuizButton = (DateTime.Now - lastAttemptTime).TotalMinutes >= 1;
+            }
+        }
+
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand fw-bold" asp-area="" asp-controller="Book" asp-action="Index">Libraria BookHeaven</a>
@@ -30,10 +41,19 @@
                         <li class="nav-item" style="margin-top: 5px;">
                             <a class="nav-link text-dark fw-bold fs-5" asp-area="" asp-controller="BookCart" asp-action="ViewCart">Cos</a>
                         </li>
+
+                        <!-- QUIZ apare doar pentru utilizatorii autentificați și doar dacă au trecut 10 minute de la ultimul quiz -->
+                        @if (showQuizButton)
+                        {
+                            <li class="nav-item" style="margin-top: 5px;">
+                                <a class="nav-link text-dark fw-bold fs-5" asp-area="" asp-controller="Quiz" asp-action="StartQuiz">Quiz</a>
+                            </li>
+                        }
+
                         <!-- Motor de căutare -->
                         <div class="search">
                         <li class="nav-item">
-                            <form method="GET" class="form-inline" style="width:40rem; margin-left: 150px; margin-top: 5px">
+                            <form method="GET" class="form-inline" style="width:40rem; margin-left: 80px; margin-top: 5px">
                                 <div class="input-group mb-3">
                                     <input type="text" class="form-control" placeholder="Cauta printre rafturile noastre" name="search"
                                            value="@ViewBag.SearchString">
@@ -49,7 +69,9 @@
             </div>
             </div>
         </nav>
-        
+
+
+
     </header>
 
     <!-- Corpul principal -->

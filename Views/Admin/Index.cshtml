@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Panou Admin";
+}
+
+<div class="container mt-5">
+    <h2 class="text-primary text-center">📊 Panou de administrare</h2>
+    <p class="text-center text-muted">Alege ce vrei să gestionezi</p>
+
+    <div class="row text-center">
+        <div class="col-md-4">
+            <a class="btn btn-primary btn-lg d-block mb-3" asp-action="ManageQuizzes">📚 Gestionare Quiz-uri</a>
+        </div>
+        <div class="col-md-4">
+            <a class="btn btn-primary btn-lg d-block mb-3" asp-action="ManageBooks">📖 Gestionare Cărți</a>
+        </div>
+        <div class="col-md-4">
+            <a class="btn btn-primary btn-lg d-block mb-3" asp-action="ManageReviews">📝 Gestionare Recenzii</a>
+        </div>
+    </div>
+</div>

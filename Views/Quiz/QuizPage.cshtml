@@ -1,0 +1,61 @@
+﻿@model List<LibrarieOnline.Models.QuestionQuizModel>
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+            <h2 class="text-center text-primary fw-bold">📚 Rezolvă Quiz-ul</h2>
+            <p class="text-center text-muted">Răspunde la întrebările de mai jos și câștigă puncte!</p>
+
+            <form asp-action="SubmitQuiz" asp-controller="Quiz" method="post" class="mt-4">
+                <input type="hidden" name="quizId" value="@ViewBag.QuizId" />
+
+                @foreach (var question in Model)
+                {
+                    <div class="mb-4 p-3 border rounded bg-light">
+                        <p class="fw-bold text-dark">@question.Question</p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="userAnswers[@question.QuestionID]" value="@question.Answer1" required>
+                            <label class="form-check-label">@question.Answer1</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="userAnswers[@question.QuestionID]" value="@question.Answer2" required>
+                            <label class="form-check-label">@question.Answer2</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="userAnswers[@question.QuestionID]" value="@question.Answer3" required>
+                            <label class="form-check-label">@question.Answer3</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="userAnswers[@question.QuestionID]" value="@question.Answer4" required>
+                            <label class="form-check-label">@question.Answer4</label>
+                        </div>
+                    </div>
+                }
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success btn-lg px-5 py-2 fw-bold shadow-sm">
+                        🚀 Trimite răspunsurile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        max-width: 800px;
+        margin: auto;
+        border-radius: 15px;
+        background: #ffffff;
+    }
+
+    .btn-success {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .btn-success:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 4px 15px rgba(40, 167, 69, 0.5);
+        }
+</style>

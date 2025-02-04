@@ -1,0 +1,51 @@
+﻿@model List<LibrarieOnline.Models.CommentModel>
+
+<div class="container mt-4">
+    <h2 class="text-center">📝 Gestionare Recenzii</h2>
+    <p class="text-muted text-center">Șterge recenziile care încalcă politica librăriei</p>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            🛑 Nu există recenzii disponibile.
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Utilizator</th>
+                    <th>Carte</th>
+                    <th>Comentariu</th>
+                    <th>Rating</th>
+                    <th>Data</th>
+                    <th>Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var review in Model)
+                {
+                    <tr>
+                        <td>@review.User.UserName</td>
+                        <td>@review.Book.Title</td>
+                        <td>@review.Content</td>
+                        <td>
+                            @for (int i = 0; i < review.Rating; i++)
+                            {
+                                <span class="text-warning">⭐</span>
+                            }
+                        </td>
+                        <td>@review.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <a class="btn btn-danger btn-sm" asp-action="DeleteReview" asp-route-id="@review.CommentID"
+                               onclick="return confirm('Ești sigur că vrei să ștergi această recenzie?');">
+                                🗑️ Ștergere
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
