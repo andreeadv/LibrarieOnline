@@ -1,17 +1,10 @@
 ﻿<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
 <form asp-action="FinalizeOrder" asp-controller="Order" method="post" id="finalizeOrderForm">
-<<<<<<< HEAD
     <!-- Last Name -->
     <div class="form-group">
         <label for="lastName">
             <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Nume
-=======
-    @* Verificare si afisare sau input pentru Nume *@
-    <div class="form-group">
-        <label for="lastName">
-            <i class="fas fa-exclamation-circle text-danger"></i> Nume
->>>>>>> 4f7f9b358865d54b0c1d6aab5a71f6178bb0a31e
         </label>
         @if (Model.User != null && !string.IsNullOrEmpty(Model.User.LastName))
         {
@@ -24,17 +17,10 @@
         }
     </div>
 
-<<<<<<< HEAD
     <!-- First Name -->
     <div class="form-group">
         <label for="firstName">
             <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Prenume
-=======
-    @* Verificare si afisare sau input pentru Prenume *@
-    <div class="form-group">
-        <label for="firstName">
-            <i class="fas fa-exclamation-circle text-danger"></i> Prenume
->>>>>>> 4f7f9b358865d54b0c1d6aab5a71f6178bb0a31e
         </label>
         @if (Model.User != null && !string.IsNullOrEmpty(Model.User.FirstName))
         {
@@ -47,17 +33,10 @@
         }
     </div>
 
-<<<<<<< HEAD
     <!-- Phone Number -->
     <div class="form-group">
         <label for="phoneNumber">
             <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Număr de telefon
-=======
-    @* Verificare si afisare sau input pentru Număr de telefon *@
-    <div class="form-group">
-        <label for="phoneNumber">
-            <i class="fas fa-exclamation-circle text-danger"></i> Număr de telefon
->>>>>>> 4f7f9b358865d54b0c1d6aab5a71f6178bb0a31e
         </label>
         @if (Model.User != null && !string.IsNullOrEmpty(Model.User.PhoneNumber))
         {
@@ -70,17 +49,10 @@
         }
     </div>
 
-<<<<<<< HEAD
     <!-- Email -->
     <div class="form-group">
         <label for="email">
             <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Adresa de email
-=======
-    @* Verificare si afisare sau input pentru Adresa de email *@
-    <div class="form-group">
-        <label for="email">
-            <i class="fas fa-exclamation-circle text-danger"></i> Adresa de email
->>>>>>> 4f7f9b358865d54b0c1d6aab5a71f6178bb0a31e
         </label>
         @if (Model.User != null && !string.IsNullOrEmpty(Model.User.Email))
         {
@@ -95,27 +67,17 @@
 
     <div class="form-group">
         <label for="paymentType">
-<<<<<<< HEAD
             <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Metoda de plată
         </label>
         <select id="paymentType" name="PaymentType" class="form-control" required onchange="updatePaymentDetails()">
             <option value="Cash" selected>Numerar</option>
             <option value="Card">Card</option>
             <option value="Transfer">Transfer bancar</option>
-=======
-            <i class="fas fa-exclamation-circle text-danger"></i> Metoda de plată
-        </label>
-        <select id="paymentType" name="PaymentType" class="form-control" required onchange="updatePaymentDetails()">
-            <option value="Cash" selected>Numerar</option>
-            <option value="Card">Card <i class="fas fa-credit-card"></i></option>
-            <option value="Transfer">Transfer bancar <i class="fas fa-university"></i></option>
->>>>>>> 4f7f9b358865d54b0c1d6aab5a71f6178bb0a31e
         </select>
     </div>
 
     <div id="paymentDetailsCard" class="form-group d-none">
         <label for="cardNumber">
-<<<<<<< HEAD
             <i class="fas fa-credit-card validation-icon" data-default-icon="fa-credit-card"></i> Număr card
         </label>
         <input type="text" id="cardNumber" name="CardNumber" class="form-control" placeholder="Introduceți numărul cardului" pattern="^\d{16}$" required />
@@ -141,6 +103,7 @@
         </label>
         <textarea id="address" name="Address" class="form-control" rows="3" required placeholder="Introduceți adresa completă pentru livrare"></textarea>
     </div>
+
     <div class="form-group">
         <button type="button" class="btn btn-success mt-3" onclick="validateAndSubmit()">Finalizează comanda</button>
     </div>
@@ -152,68 +115,6 @@
             validateField(field);
         });
     });
-=======
-            <i class="fas fa-credit-card"></i> Număr card
-        </label>
-        <input type="text" id="cardNumber" name="CardNumber" class="form-control" placeholder="Introduceți numărul cardului" pattern="^\d{16}$" />
-
-        <label for="cardHolder">
-            <i class="fas fa-user"></i> Nume titular card
-        </label>
-        <input type="text" id="cardHolder" name="CardHolder" class="form-control" placeholder="Introduceți numele titularului cardului" />
-
-        <label for="cardExpiration">
-            <i class="fas fa-calendar-alt"></i> Dată expirare
-        </label>
-        <input type="text" id="cardExpiration" name="CardExpiration" class="form-control" placeholder="MM/AA" pattern="^(0[1-9]|1[0-2])\/\d{2}$" />
-
-        <label for="cardCVV">
-            <i class="fas fa-lock"></i> Cod CVV
-        </label>
-        <input type="text" id="cardCVV" name="CardCVV" class="form-control" placeholder="Introduceți codul CVV" pattern="^\d{3}$" />
-    </div>
-
-    <div id="paymentDetailsTransfer" class="form-group d-none">
-        <label for="bankName">
-            <i class="fas fa-university"></i> Nume bancă
-        </label>
-        <input type="text" id="bankName" name="BankName" class="form-control" placeholder="Introduceți numele băncii" />
-
-        <label for="accountNumber">
-            <i class="fas fa-hashtag"></i> Număr cont
-        </label>
-        <input type="text" id="accountNumber" name="AccountNumber" class="form-control" placeholder="Introduceți numărul contului" />
-
-        <label for="iban">
-            <i class="fas fa-globe"></i> IBAN
-        </label>
-        <input type="text" id="iban" name="IBAN" class="form-control" placeholder="Introduceți IBAN-ul" pattern="^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$" />
-    </div>
-
-    <div class="form-group">
-        <label for="address">
-            <i class="fas fa-exclamation-circle text-danger"></i> Adresa de livrare
-        </label>
-        <textarea id="address" name="Address" class="form-control" rows="3" required placeholder="Introduceți adresa completă pentru livrare"></textarea>
-    </div>
-
-    <button type="button" class="btn btn-success mt-3" onclick="validateAndSubmit()">Finalizează comanda</button>
-</form>
-
-<script>
-    function validateAndSubmit() {
-        const form = document.getElementById('finalizeOrderForm');
-        if (form.checkValidity()) {
-            alert('Comanda a fost plasată cu succes!');
-            form.submit();
-        } else {
-            alert('Vă rugăm să completați toate câmpurile obligatorii corect.');
-        }
-    }
-
-    function updatePaymentDetails() {
-        const paymentType = document.getElementById("paymentType").value;
->>>>>>> 4f7f9b358865d54b0c1d6aab5a71f6178bb0a31e
 
     function validateField(field) {
         const label = document.querySelector(`label[for="${field.id}"]`);
@@ -227,7 +128,6 @@
             }
         }
     }
-<<<<<<< HEAD
 
     function validateAndSubmit() {
         const form = document.getElementById('finalizeOrderForm');
@@ -252,6 +152,3 @@
         document.getElementById("paymentDetailsCard").classList.toggle("d-none", document.getElementById("paymentType").value !== "Card");
     }
 </script>
-=======
-</script>
->>>>>>> 4f7f9b358865d54b0c1d6aab5a71f6178bb0a31e
