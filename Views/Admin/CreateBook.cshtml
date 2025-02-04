@@ -3,35 +3,90 @@
 <div class="container mt-4">
     <h2 class="text-center text-primary">📖 Adaugă o Carte Nouă</h2>
 
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
     <form asp-action="CreateBook" asp-controller="Admin" method="post" class="mt-4">
         <div class="mb-3">
             <label class="form-label">Titlu</label>
             <input asp-for="Title" class="form-control" required>
+            <span asp-validation-for="Title" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Autor</label>
             <input asp-for="Author" class="form-control" required>
+            <span asp-validation-for="Author" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Preț</label>
             <input asp-for="Price" type="number" step="0.01" class="form-control" required>
+            <span asp-validation-for="Price" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Descriere</label>
             <textarea asp-for="Description" class="form-control" rows="3" required></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Număr Pagini</label>
+            <input asp-for="NrPages" type="number" class="form-control" required>
+            <span asp-validation-for="NrPages" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Data Publicării</label>
+            <input asp-for="PublishedDate" type="date" class="form-control" required>
+            <span asp-validation-for="PublishedDate" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Rating</label>
+            <select asp-for="AvgRating" class="form-select" required>
+                <option value="">Selectează Rating</option>
+                <option value="1">⭐</option>
+                <option value="2">⭐⭐</option>
+                <option value="3">⭐⭐⭐</option>
+                <option value="4">⭐⭐⭐⭐</option>
+                <option value="5">⭐⭐⭐⭐⭐</option>
+            </select>
+            <span asp-validation-for="AvgRating" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Imagine (URL)</label>
             <input asp-for="Image" class="form-control">
+            <span asp-validation-for="Image" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Categorie</label>
-            <input asp-for="CategoryID" class="form-control">
+            <select asp-for="CategoryID" class="form-select" required>
+                <option value="">Selectează Categorie</option>
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <option value="@category.CategoryID">@category.CategoryName</option>
+                }
+            </select>
+            <span asp-validation-for="CategoryID" class="text-danger"></span>
+        </div>
+
+
+        <div class="mb-3 form-check">
+            <input class="form-check-input" type="checkbox" asp-for="Approved">
+            <label class="form-check-label">Aprobat</label>
         </div>
 
         <div class="text-center">
@@ -40,3 +95,9 @@
         </div>
     </form>
 </div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+}

@@ -27,7 +27,7 @@ namespace LibrarieOnline.Models
         [MinLength(5, ErrorMessage = "Numele autorului trebuie sa aiba mai mult de 5 caractere")]
         public string? Author { get; set; }
         [Required(ErrorMessage = "Ratingul este obligatoriu")]
-        [Range(1, 5)]
+        [Range(0, 5)]
         public int AvgRating { get; set; }
         public int? CategoryID { get; set; }
         public bool Approved { get; set; }

@@ -1,0 +1,47 @@
+﻿@model LibrarieOnline.Models.QuizModel
+
+<div class="container mt-4">
+    <h2 class="text-center text-warning">✏️ Editare Quiz și Întrebări</h2>
+
+    <form asp-action="SaveQuizChanges" method="post" class="mt-4">
+        <input type="hidden" asp-for="QuizID" />
+
+        <div class="mb-3">
+            <label class="form-label"> Nume Quiz</label>
+            <textarea asp-for="Question" class="form-control" rows="2" required></textarea>
+            <span asp-validation-for="Question" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Dificultate Quiz</label>
+            <input asp-for="Score" type="number" class="form-control" required>
+            <span asp-validation-for="Score" class="text-danger"></span>
+        </div>
+
+        <h4 class="mt-4">✏️ Întrebările Quiz-ului</h4>
+        <div id="questions-container">
+            @for (int i = 0; i < Model.QuestionQuizzes.Count; i++)
+            {
+                <input type="hidden" name="Questions[@i].QuestionID" value="@Model.QuestionQuizzes.ElementAt(i).QuestionID" />
+                <div class="card p-3 mb-2">
+                    <label class="form-label">Întrebare</label>
+                    <input type="text" name="Questions[@i].Question" class="form-control" value="@Model.QuestionQuizzes.ElementAt(i).Question" required>
+
+                    <label class="form-label mt-2">Răspunsuri</label>
+                    <input type="text" name="Questions[@i].Answer1" class="form-control" value="@Model.QuestionQuizzes.ElementAt(i).Answer1" required>
+                    <input type="text" name="Questions[@i].Answer2" class="form-control mt-1" value="@Model.QuestionQuizzes.ElementAt(i).Answer2" required>
+                    <input type="text" name="Questions[@i].Answer3" class="form-control mt-1" value="@Model.QuestionQuizzes.ElementAt(i).Answer3" required>
+                    <input type="text" name="Questions[@i].Answer4" class="form-control mt-1" value="@Model.QuestionQuizzes.ElementAt(i).Answer4" required>
+
+                    <label class="form-label mt-2">Răspuns Corect</label>
+                    <input type="text" name="Questions[@i].CorrectAnswer" class="form-control" value="@Model.QuestionQuizzes.ElementAt(i).CorrectAnswer" required>
+                </div>
+            }
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-warning">💾 Salvează Modificările</button>
+            <a asp-action="ManageQuizzes" class="btn btn-secondary">🔙 Înapoi</a>
+        </div>
+    </form>
+</div>

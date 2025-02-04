@@ -78,7 +78,11 @@ namespace LibrarieOnline.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitQuiz(int quizId, Dictionary<int, string> userAnswers)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.Identity.IsAuthenticated ? User.Identity.Name : null;
+            if (userId != null)
+            {
+                HttpContext.Session.SetString($"LastQuizAttempt_{userId}", DateTime.Now.ToString());
+            }
             if (userId == null) return Unauthorized();
 
             var questions = await _context.QuestionQuizzes.Where(q => q.QuizID == quizId).ToListAsync();

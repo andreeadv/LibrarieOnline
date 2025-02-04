@@ -18,13 +18,13 @@ namespace LibrarieOnline.Controllers
             _context = context;
         }
 
-        // 🎯 Panoul de administrare
+        //  Panoul de administrare
         public IActionResult Index()
         {
             return View();
         }
 
-        // 🎯 CRUD pentru Quiz-uri
+        //  CRUD pentru Quiz-uri
         public async Task<IActionResult> ManageQuizzes()
         {
             var quizzes = await _context.Quizzes.ToListAsync();
@@ -50,10 +50,91 @@ namespace LibrarieOnline.Controllers
 
         public async Task<IActionResult> EditQuiz(int id)
         {
-            var quiz = await _context.Quizzes.FindAsync(id);
+            var quiz = await _context.Quizzes
+                .Include(q => q.QuestionQuizzes)
+                .FirstOrDefaultAsync(q => q.QuizID == id);
+
             if (quiz == null) return NotFound();
+
             return View(quiz);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveQuizChanges(QuizModel quiz, List<QuestionQuizModel> Questions)
+        {
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("❌ ModelState nu este valid!");
+                return View("EditQuiz", quiz);
+            }
+
+            var existingQuiz = await _context.Quizzes
+                .Include(q => q.QuestionQuizzes)
+                .FirstOrDefaultAsync(q => q.QuizID == quiz.QuizID);
+
+            if (existingQuiz == null) return NotFound();
+
+            // Actualizăm detaliile quiz-ului
+            existingQuiz.Question = quiz.Question;
+            existingQuiz.Score = quiz.Score;
+
+            // Actualizăm fiecare întrebare
+            foreach (var updatedQuestion in Questions)
+            {
+                var existingQuestion = existingQuiz.QuestionQuizzes.FirstOrDefault(q => q.QuestionID == updatedQuestion.QuestionID);
+                if (existingQuestion != null)
+                {
+                    existingQuestion.Question = updatedQuestion.Question;
+                    existingQuestion.Answer1 = updatedQuestion.Answer1;
+                    existingQuestion.Answer2 = updatedQuestion.Answer2;
+                    existingQuestion.Answer3 = updatedQuestion.Answer3;
+                    existingQuestion.Answer4 = updatedQuestion.Answer4;
+                    existingQuestion.CorrectAnswer = updatedQuestion.CorrectAnswer;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ManageQuizzes");
+        }
+
+        [HttpPost]
+        [HttpPost]
+        public async Task<IActionResult> SaveNewQuiz(QuizModel quiz, List<QuestionQuizModel> Questions)
+        {
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("❌ ModelState nu este valid!");
+                return View("CreateQuiz", quiz);
+            }
+
+            // Setăm RewardID la 3
+            quiz.RewardID = 3;
+
+            //  Verificăm dacă RewardID=3 există în baza de date
+            var existingReward = await _context.Rewards.FindAsync(quiz.RewardID);
+            if (existingReward == null)
+            {
+                Console.WriteLine("❌ Eroare: RewardID=3 nu există în baza de date!");
+                ModelState.AddModelError("", "RewardID=3 nu este valid. Te rog să adaugi o recompensă cu ID=3 în baza de date.");
+                return View("CreateQuiz", quiz);
+            }
+
+            //  Salvăm quiz-ul cu RewardID=3
+            await _context.Quizzes.AddAsync(quiz);
+            await _context.SaveChangesAsync(); // Salvăm pentru a obține `QuizID`
+
+            // Asociem întrebările noului quiz
+            foreach (var question in Questions)
+            {
+                question.QuizID = quiz.QuizID;
+                _context.QuestionQuizzes.Add(question);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ManageQuizzes");
+        }
+
+
 
         [HttpPost]
         public async Task<IActionResult> EditQuiz(QuizModel quiz)
@@ -77,7 +158,7 @@ namespace LibrarieOnline.Controllers
             return RedirectToAction("ManageQuizzes");
         }
 
-        // 🎯 CRUD pentru Cărți
+        //  CRUD pentru Cărți
         public async Task<IActionResult> ManageBooks()
         {
             var books = await _context.Books.ToListAsync();
@@ -86,65 +167,70 @@ namespace LibrarieOnline.Controllers
 
         public IActionResult CreateBook()
         {
+            ViewBag.Categories = _context.Categories.ToList();
             return View();
         }
 
-        [HttpPost]
-        [HttpPost]
-        [HttpPost]
-        [HttpPost]
+
         [HttpPost]
         public async Task<IActionResult> CreateBook(BookModel book)
         {
-            // Debugging: Afișăm datele primite în consolă
-            Console.WriteLine("===== DEBUG: Adăugare Carte =====");
+            Console.WriteLine("===== DEBUG: Începem adăugarea cărții =====");
             Console.WriteLine($"Titlu: {book.Title}");
             Console.WriteLine($"Autor: {book.Author}");
             Console.WriteLine($"Preț: {book.Price}");
             Console.WriteLine($"Descriere: {book.Description}");
             Console.WriteLine($"Imagine: {book.Image}");
             Console.WriteLine($"Categorie ID: {book.CategoryID}");
+            Console.WriteLine($"Număr Pagini: {book.NrPages}");
+            Console.WriteLine($"Data Publicării: {book.PublishedDate}");
+            Console.WriteLine($"Rating: {book.AvgRating}");
+            Console.WriteLine($"Aprobat: {book.Approved}");
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Verificăm dacă există deja o carte cu același titlu și autor
                     var existingBook = await _context.Books
                         .FirstOrDefaultAsync(b => b.Title == book.Title && b.Author == book.Author);
 
                     if (existingBook != null)
                     {
-                        Console.WriteLine("Această carte există deja în baza de date!");
+                        Console.WriteLine(" Această carte există deja în baza de date!");
                         ModelState.AddModelError("", "O carte cu acest titlu și autor există deja.");
                         return View(book);
                     }
 
+                    // Adăugăm cartea în baza de date
                     await _context.Books.AddAsync(book);
-                    Console.WriteLine("Cartea a fost adăugată în context. Salvăm modificările...");
+                    Console.WriteLine(" Cartea a fost adăugată în contextul EF. Salvăm modificările...");
 
                     await _context.SaveChangesAsync();
-                    Console.WriteLine("Cartea a fost adăugată cu succes!");
+                    Console.WriteLine(" Cartea a fost adăugată cu succes!");
 
                     TempData["SuccessMessage"] = "Cartea a fost adăugată cu succes!";
                     return RedirectToAction("ManageBooks");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Eroare la adăugare: {ex.Message}");
+                    Console.WriteLine($" Eroare la adăugare: {ex.Message}");
+                    Console.WriteLine($" Stack Trace: {ex.StackTrace}");
                     ModelState.AddModelError("", "A apărut o eroare în timpul adăugării cărții.");
                 }
             }
             else
             {
-                Console.WriteLine("ModelState NU este valid!");
+                Console.WriteLine(" ModelState NU este valid!");
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
-                    Console.WriteLine($"EROARE: {error.ErrorMessage}");
+                    Console.WriteLine($" EROARE: {error.ErrorMessage}");
                 }
             }
 
             return View(book);
         }
+
 
 
 
@@ -203,7 +289,7 @@ namespace LibrarieOnline.Controllers
             return RedirectToAction("ManageBooks");
         }
 
-        // 🎯 Ștergere recenzii
+        // Ștergere recenzii
         public async Task<IActionResult> ManageReviews()
         {
             var reviews = await _context.Comments.Include(c => c.User).Include(c => c.Book).ToListAsync();

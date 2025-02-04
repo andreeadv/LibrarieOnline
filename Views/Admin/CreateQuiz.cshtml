@@ -1,0 +1,50 @@
+﻿@model LibrarieOnline.Models.QuizModel
+
+<div class="container mt-4">
+    <h2 class="text-center text-success">➕ Creare Quiz Nou</h2>
+
+    <form asp-action="SaveNewQuiz" method="post" class="mt-4">
+        <div class="mb-3">
+            <label class="form-label">Nume Quiz</label>
+            <textarea asp-for="Question" class="form-control" rows="2" required></textarea>
+            <span asp-validation-for="Question" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Dificultatea quiz-ului</label>
+            <input asp-for="Score" type="number" class="form-control" required>
+            <span asp-validation-for="Score" class="text-danger"></span>
+        </div>
+
+        <h4 class="mt-4">➕ Întrebări pentru Quiz</h4>
+        <div id="questions-container">
+            @for (int i = 0; i < 3; i++)  // Se pot adăuga 3 întrebări implicit
+            {
+                <div class="card p-3 mb-2">
+                    <label class="form-label">Întrebare @(i + 1)</label>
+                    <input type="text" name="Questions[@i].Question" class="form-control" required>
+
+                    <label class="form-label mt-2">Răspunsuri</label>
+                    <input type="text" name="Questions[@i].Answer1" class="form-control" required>
+                    <input type="text" name="Questions[@i].Answer2" class="form-control mt-1" required>
+                    <input type="text" name="Questions[@i].Answer3" class="form-control mt-1" required>
+                    <input type="text" name="Questions[@i].Answer4" class="form-control mt-1" required>
+
+                    <label class="form-label mt-2">Răspuns Corect</label>
+                    <input type="text" name="Questions[@i].CorrectAnswer" class="form-control" required>
+                </div>
+            }
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-success">💾 Salvează Quiz-ul</button>
+            <a asp-action="ManageQuizzes" class="btn btn-secondary">🔙 Înapoi</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+}
