@@ -52,12 +52,26 @@
     <br />
 }
 
+
 <div class="d-flex justify-content-between flex-row mt-2 mb-2">
-    <p class="card-text d-flex justify-content-center rounded px-2 py-1 bg-success text-light">@ViewBag.TotalPrice lei</p>
+    <p id="total-price" class="card-text d-flex justify-content-center rounded px-2 py-1 bg-success text-light">@ViewBag.TotalPrice lei</p>
+    <button id="apply-discount" class="btn btn-warning">Aplică Reducerea pe baza punctelor!</button>
     <a class="btn btn-outline-success" asp-controller="Order" asp-action="FinalizeOrder">
         <i class="bi bi-send"></i> Finalizati Comanda
     </a>
 </div>
+
+<script>
+    document.getElementById("apply-discount").addEventListener("click", function () {
+        fetch("/BookCart/ApplyDiscount")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("total-price").innerText = data.newTotalPrice + " lei";
+            })
+            .catch(error => console.error("Eroare:", error));
+    });
+</script>
+
 
     </script>
 </div>

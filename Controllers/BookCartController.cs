@@ -346,6 +346,45 @@ namespace LibrarieOnline.Controllers
 
             return RedirectToAction("ViewCart");
         }
+        [HttpGet]
+        public async Task<IActionResult> ApplyDiscount()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return NotFound("Utilizatorul nu a fost găsit.");
+            }
+
+            // Obține numărul de puncte acumulate de utilizator
+            int nrPoints = user.Points;  // Asigură-te că această proprietate există în modelul utilizatorului
+
+            var cart = await _context.Carts.Include(c => c.BookCarts)
+                                           .ThenInclude(bc => bc.Book)
+                                           .ThenInclude(b => b.Category)
+                                           .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null || cart.BookCarts == null || !cart.BookCarts.Any())
+            {
+                return Json(new { newTotalPrice = 0 });
+            }
+
+            // Calculul prețului inițial
+            ViewBag.TotalPrice = cart.BookCarts.Sum(bc => bc.Book.Price * bc.Quantity);
+
+            // Aplică reducerea: scade 0.2 * nrPuncte din totalPrice
+            var discount = 0.2m * nrPoints;
+            var newTotalPrice = Math.Max((decimal)ViewBag.TotalPrice - discount, 0); // Asigură că nu devine negativ
+
+            return Json(new { newTotalPrice });
+        }
+
 
     }
 }
