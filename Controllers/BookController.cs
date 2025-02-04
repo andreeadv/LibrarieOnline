@@ -4,20 +4,21 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-
 namespace LibrarieOnline.Controllers
 {
     public class BookController : Controller
     {
         private readonly LibrarieOnlineContext _context;
+        private readonly SentimentAnalysisService _sentimentAnalysisService;
         public BookModel? CurrentBook { get; set; }
         int pointsEarned = 0; // Pentru punctele de recompensă
 
 
         // Constructorul
-        public BookController(LibrarieOnlineContext context)
+        public BookController(LibrarieOnlineContext context, SentimentAnalysisService sentimentService)
         {
             _context = context;
+            _sentimentAnalysisService = sentimentService;
         }
    
 
@@ -144,7 +145,8 @@ namespace LibrarieOnline.Controllers
 
             var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             var reward = await _context.Rewards.FirstOrDefaultAsync(r => r.RewardID == 2);
-
+            var sentiment = await _sentimentAnalysisService.AnalyzeSentimentAsync(content);
+            Console.WriteLine(sentiment);
             if (currentUser != null)
             {
                 currentUser.Points += (int)reward.Points;
@@ -165,7 +167,13 @@ namespace LibrarieOnline.Controllers
                 UserId = userId,
                 Content = content,
                 Rating = rating,
-                Date = DateTime.Now
+                Date = DateTime.Now,
+                Sentiment = sentiment switch
+                {
+                    "positive" => "Pozitiv",
+                    "negative" => "Negativ",
+                    _ => "Neutră"
+                }
             };
 
             _context.Comments.Add(review);

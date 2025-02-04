@@ -3,6 +3,8 @@ using LibrarieOnline.Data;
 using LibrarieOnline.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
+using System.Net.Http;
 
 namespace LibrarieOnline
 {
@@ -35,7 +37,25 @@ namespace LibrarieOnline
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+          
 
+            // Register SentimentAnalysisService
+            builder.Services.AddHttpClient<SentimentAnalysisService>((serviceProvider, client) =>
+            {
+                var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+                var apiKey = configuration["WatsonNLP:ApiKey"];
+                var serviceUrl = configuration["WatsonNLP:Url"];
+
+                if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(serviceUrl))
+                {
+                    throw new InvalidOperationException("API key or Service URL is not configured in appsettings.json.");
+                }
+
+                client.BaseAddress = new Uri(serviceUrl);
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", apiKey);
+            });
+            
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
