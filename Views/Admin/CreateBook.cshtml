@@ -1,0 +1,42 @@
+﻿@model LibrarieOnline.Models.BookModel
+
+<div class="container mt-4">
+    <h2 class="text-center text-primary">📖 Adaugă o Carte Nouă</h2>
+
+    <form asp-action="CreateBook" asp-controller="Admin" method="post" class="mt-4">
+        <div class="mb-3">
+            <label class="form-label">Titlu</label>
+            <input asp-for="Title" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Autor</label>
+            <input asp-for="Author" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Preț</label>
+            <input asp-for="Price" type="number" step="0.01" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descriere</label>
+            <textarea asp-for="Description" class="form-control" rows="3" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Imagine (URL)</label>
+            <input asp-for="Image" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Categorie</label>
+            <input asp-for="CategoryID" class="form-control">
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-success">➕ Adaugă Carte</button>
+            <a asp-action="ManageBooks" class="btn btn-secondary">🔙 Înapoi</a>
+        </div>
+    </form>
+</div>

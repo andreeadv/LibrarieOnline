@@ -90,16 +90,63 @@ namespace LibrarieOnline.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
+        [HttpPost]
+        [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> CreateBook(BookModel book)
         {
+            // Debugging: Afișăm datele primite în consolă
+            Console.WriteLine("===== DEBUG: Adăugare Carte =====");
+            Console.WriteLine($"Titlu: {book.Title}");
+            Console.WriteLine($"Autor: {book.Author}");
+            Console.WriteLine($"Preț: {book.Price}");
+            Console.WriteLine($"Descriere: {book.Description}");
+            Console.WriteLine($"Imagine: {book.Image}");
+            Console.WriteLine($"Categorie ID: {book.CategoryID}");
+
             if (ModelState.IsValid)
             {
-                _context.Books.Add(book);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("ManageBooks");
+                try
+                {
+                    var existingBook = await _context.Books
+                        .FirstOrDefaultAsync(b => b.Title == book.Title && b.Author == book.Author);
+
+                    if (existingBook != null)
+                    {
+                        Console.WriteLine("Această carte există deja în baza de date!");
+                        ModelState.AddModelError("", "O carte cu acest titlu și autor există deja.");
+                        return View(book);
+                    }
+
+                    await _context.Books.AddAsync(book);
+                    Console.WriteLine("Cartea a fost adăugată în context. Salvăm modificările...");
+
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine("Cartea a fost adăugată cu succes!");
+
+                    TempData["SuccessMessage"] = "Cartea a fost adăugată cu succes!";
+                    return RedirectToAction("ManageBooks");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Eroare la adăugare: {ex.Message}");
+                    ModelState.AddModelError("", "A apărut o eroare în timpul adăugării cărții.");
+                }
             }
+            else
+            {
+                Console.WriteLine("ModelState NU este valid!");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"EROARE: {error.ErrorMessage}");
+                }
+            }
+
             return View(book);
         }
+
+
 
         public async Task<IActionResult> EditBook(int id)
         {
@@ -109,16 +156,42 @@ namespace LibrarieOnline.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditBook(BookModel book)
+        [HttpPost]
+        [HttpPost]
+        public async Task<IActionResult> EditBook(int id, BookModel book)
         {
-            if (ModelState.IsValid)
+            Console.WriteLine($"BookID: {book.BookID}");
+            Console.WriteLine($"Title: {book.Title}");
+            Console.WriteLine($"Author: {book.Author}");
+            Console.WriteLine($"Price: {book.Price}");
+
+            if (id != book.BookID)
             {
-                _context.Books.Update(book);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("ManageBooks");
+                Console.WriteLine("ID-urile nu se potrivesc!");
+                return BadRequest();
             }
-            return View(book);
+
+            var existingBook = await _context.Books.FindAsync(id);
+            if (existingBook == null)
+            {
+                Console.WriteLine("Cartea nu există în baza de date!");
+                return NotFound();
+            }
+
+            existingBook.Title = book.Title;
+            existingBook.Author = book.Author;
+            existingBook.Price = book.Price;
+            existingBook.Description = book.Description;
+            existingBook.Image = book.Image;
+            existingBook.CategoryID = book.CategoryID;
+
+            await _context.SaveChangesAsync();
+            Console.WriteLine("Modificările au fost salvate cu succes!");
+
+            return RedirectToAction("ManageBooks");
         }
+
+
 
         public async Task<IActionResult> DeleteBook(int id)
         {

@@ -22,10 +22,16 @@
                     <td>@book.Price lei</td>
                     <td>
                         <a class="btn btn-warning btn-sm" asp-action="EditBook" asp-route-id="@book.BookID">✏️ Editare</a>
-                        <a class="btn btn-danger btn-sm" asp-action="DeleteBook" asp-route-id="@book.BookID">🗑️ Ștergere</a>
+                        <a class="btn btn-danger btn-sm" asp-action="DeleteBook" asp-route-id="@book.BookID" onclick="return confirmDelete();">🗑️ Ștergere</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+
+<script>
+    function confirmDelete() {
+        return confirm("Ești sigur că vrei să ștergi această carte? Această acțiune nu poate fi anulată.");
+    }
+</script>

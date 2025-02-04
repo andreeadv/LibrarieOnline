@@ -1,0 +1,19 @@
+﻿@model LibrarieOnline.Models.BookModel
+
+<div class="container mt-5 text-center">
+    <h2 class="text-danger">🗑️ Ștergere Carte</h2>
+    <p class="lead">Ești sigur că vrei să ștergi această carte?</p>
+
+    <div class="card p-3 shadow-sm">
+        <h4 class="fw-bold">@Model.Title</h4>
+        <p class="text-muted">Autor: @Model.Author</p>
+        <img src="@Model.Image" class="img-fluid" alt="@Model.Title" style="max-width: 150px;">
+        <p><strong>Preț:</strong> @Model.Price lei</p>
+    </div>
+
+    <form asp-action="DeleteBook" method="post" class="mt-3">
+        <input type="hidden" asp-for="BookID" />
+        <button type="submit" class="btn btn-danger">✅ Confirmă Ștergerea</button>
+        <a asp-action="ManageBooks" class="btn btn-secondary">🔙 Anulează</a>
+    </form>
+</div>
