@@ -15,5 +15,7 @@ namespace LibrarieOnline.Models
 
         public virtual BookModel? Book { get; set; }
         public virtual ApplicationUser? User { get; set; }
+
+        public string? Sentiment { get; set; } // "Pozitivă", "Negativă", "Neutră"
     }
 }
