@@ -347,10 +347,10 @@ namespace LibrarieOnline.Controllers
             return RedirectToAction("ViewCart");
         }
         [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> ApplyDiscount()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             if (userId == null)
             {
                 return Unauthorized();
@@ -363,11 +363,10 @@ namespace LibrarieOnline.Controllers
             }
 
             // Obține numărul de puncte acumulate de utilizator
-            int nrPoints = user.Points;  // Asigură-te că această proprietate există în modelul utilizatorului
+            int nrPoints = user.Points;
 
             var cart = await _context.Carts.Include(c => c.BookCarts)
                                            .ThenInclude(bc => bc.Book)
-                                           .ThenInclude(b => b.Category)
                                            .FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null || cart.BookCarts == null || !cart.BookCarts.Any())
@@ -376,11 +375,14 @@ namespace LibrarieOnline.Controllers
             }
 
             // Calculul prețului inițial
-            ViewBag.TotalPrice = cart.BookCarts.Sum(bc => bc.Book.Price * bc.Quantity);
+            decimal totalPrice = cart.BookCarts.Sum(bc => bc.Book.Price * bc.Quantity);
 
             // Aplică reducerea: scade 0.2 * nrPuncte din totalPrice
-            var discount = 0.2m * nrPoints;
-            var newTotalPrice = Math.Max((decimal)ViewBag.TotalPrice - discount, 0); // Asigură că nu devine negativ
+            decimal discount = 0.2m * nrPoints;
+            decimal newTotalPrice = Math.Max(totalPrice - discount, 0);
+
+            // Salvăm temporar reducerea pentru a fi aplicată la finalizarea comenzii
+            HttpContext.Session.SetInt32("PointsUsed", (int)(discount / 0.2m));
 
             return Json(new { newTotalPrice });
         }
