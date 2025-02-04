@@ -83,7 +83,17 @@ namespace LibrarieOnline.Controllers
             }
 
             var totalPrice = cart.BookCarts.Sum(bc => bc.Book.Price * bc.Quantity);
+            // Verificăm dacă utilizatorul a aplicat o reducere
+            int pointsUsed = HttpContext.Session.GetInt32("PointsUsed") ?? 0;
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (pointsUsed > 0)
+            {
+                // Scădem punctele utilizate din totalul utilizatorului
+                user.Points = Math.Max(user.Points - pointsUsed, 0);
 
+                // Ștergem punctele folosite din sesiune
+                HttpContext.Session.Remove("PointsUsed");
+            }
             order.UserId = userId;
             order.CartID = cart.CartID;
             order.Status = "Comandă plasată";

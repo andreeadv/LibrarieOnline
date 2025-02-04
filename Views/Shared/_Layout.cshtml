@@ -16,13 +16,33 @@
 <body>
     <header>
         @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+        @using Microsoft.AspNetCore.Identity
+        @using LibrarieOnline.Models
+
+        @inject UserManager<ApplicationUser> UserManager
+        @inject SignInManager<ApplicationUser> SignInManager
+
         @{
-            var lastAttempt = HttpContextAccessor.HttpContext.Session.GetString("LastQuizAttempt");
-            bool showQuizButton = User.Identity.IsAuthenticated; // Afișăm doar dacă utilizatorul este conectat
+            var userId = User.Identity.IsAuthenticated ? User.Identity.Name : null;
+            var lastAttempt = userId != null ? HttpContextAccessor.HttpContext.Session.GetString($"LastQuizAttempt_{userId}") : null;
+
+            bool showQuizButton = User.Identity.IsAuthenticated;
+            bool isAdmin = false;
 
             if (showQuizButton && !string.IsNullOrEmpty(lastAttempt) && DateTime.TryParse(lastAttempt, out DateTime lastAttemptTime))
             {
-                showQuizButton = (DateTime.Now - lastAttemptTime).TotalMinutes >= 1;
+                showQuizButton = (DateTime.Now - lastAttemptTime).TotalMinutes >= 10;
+            }
+
+            // Verificăm dacă utilizatorul este autentificat și are rolul "Admin"
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await UserManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    var roles = await UserManager.GetRolesAsync(user);
+                    isAdmin = roles.Contains("Admin");
+                }
             }
         }
 
@@ -39,10 +59,10 @@
                             <a class="nav-link text-dark fw-bold fs-5" asp-area="" asp-controller="Book" asp-action="Index">Carti</a>
                         </li>
                         <li class="nav-item" style="margin-top: 5px;">
-                            <a class="nav-link text-dark fw-bold fs-5" asp-area="" asp-controller="BookCart" asp-action="ViewCart">Cos </a> 
+                            <a class="nav-link text-dark fw-bold fs-5" asp-area="" asp-controller="BookCart" asp-action="ViewCart">Cos</a>
                         </li>
 
-                        <!-- QUIZ apare doar pentru utilizatorii autentificați și doar dacă au trecut 10 minute de la ultimul quiz -->
+                        <!-- QUIZ apare doar pentru utilizatorii autentificați și doar dacă au trecut 10 minute de la ultimul quiz al utilizatorului curent -->
                         @if (showQuizButton)
                         {
                             <li class="nav-item" style="margin-top: 5px;">
@@ -50,10 +70,18 @@
                             </li>
                         }
 
+                        <!-- Admin apare doar pentru utilizatorii cu rolul "Admin" -->
+                        @if (isAdmin)
+                        {
+                            <li class="nav-item" style="margin-top: 5px;">
+                                <a class="nav-link text-danger fw-bold fs-5" asp-area="" asp-controller="Admin" asp-action="Dashboard">Admin</a>
+                            </li>
+                        }
+
                         <!-- Motor de căutare -->
                         <div class="search">
                         <li class="nav-item">
-                            <form method="GET" class="form-inline" style="width:40rem; margin-left: 80px; margin-top: 5px">
+                            <form method="GET" class="form-inline" style="width:40rem; margin-left: 20px; margin-top: 5px">
                                 <div class="input-group mb-3">
                                     <input type="text" class="form-control" placeholder="Cauta printre rafturile noastre" name="search"
                                            value="@ViewBag.SearchString">
@@ -69,7 +97,6 @@
             </div>
             </div>
         </nav>
-
 
 
     </header>

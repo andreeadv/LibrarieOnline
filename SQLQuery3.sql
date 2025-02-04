@@ -1,1 +1,1 @@
-﻿
+﻿DELETE FROM ORDERS;
