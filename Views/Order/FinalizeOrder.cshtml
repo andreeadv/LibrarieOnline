@@ -1,146 +1,153 @@
-﻿@model LibrarieOnline.Models.OrderModel
+﻿<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
-@{
-    ViewBag.Title = "Finalizare comandă";
-}
-
-<h2>Finalizare comandă</h2>
-
-@if (TempData["Message"] != null)
-{
-    <div id="success-message" class="alert alert-success">
-        @TempData["Message"]
+<form asp-action="FinalizeOrder" asp-controller="Order" method="post" id="finalizeOrderForm">
+    <!-- Last Name -->
+    <div class="form-group">
+        <label for="lastName">
+            <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Nume
+        </label>
+        @if (Model.User != null && !string.IsNullOrEmpty(Model.User.LastName))
+        {
+            <p>@Model.User.LastName</p>
+            <input type="hidden" name="LastName" value="@Model.User.LastName" />
+        }
+        else
+        {
+            <input type="text" id="lastName" name="LastName" class="form-control" placeholder="Introduceți numele" required />
+        }
     </div>
-}
 
-<div class="card mt-4">
-    <div class="card-body">
-        <h4 class="card-title">Detalii comandă</h4>
-        <p><strong>Total de plată:</strong> @Model.Total lei</p>
-        <p><strong>Status:</strong> @Model.Status</p>
-
-        <form asp-action="FinalizeOrder" asp-controller="Order" method="post" id="finalizeOrderForm">
-            @* Verificare si afisare sau input pentru Nume *@
-            <div class="form-group">
-                <label for="lastName">Nume</label>
-                @if (Model.User != null && !string.IsNullOrEmpty(Model.User.LastName))
-                {
-                    <p>@Model.User.LastName</p>
-                    <input type="hidden" name="LastName" value="@Model.User.LastName" />
-                }
-                else
-                {
-                    <input type="text" id="lastName" name="LastName" class="form-control" placeholder="Introduceți numele" required />
-                }
-            </div>
-
-            @* Verificare si afisare sau input pentru Prenume *@
-            <div class="form-group">
-                <label for="firstName">Prenume</label>
-                @if (Model.User != null && !string.IsNullOrEmpty(Model.User.FirstName))
-                {
-                    <p>@Model.User.FirstName</p>
-                    <input type="hidden" name="FirstName" value="@Model.User.FirstName" />
-                }
-                else
-                {
-                    <input type="text" id="firstName" name="FirstName" class="form-control" placeholder="Introduceți prenumele" required />
-                }
-            </div>
-
-            @* Verificare si afisare sau input pentru Număr de telefon *@
-            <div class="form-group">
-                <label for="phoneNumber">Număr de telefon</label>
-                @if (Model.User != null && !string.IsNullOrEmpty(Model.User.PhoneNumber))
-                {
-                    <p>@Model.User.PhoneNumber</p>
-                    <input type="hidden" name="PhoneNumber" value="@Model.User.PhoneNumber" />
-                }
-                else
-                {
-                    <input type="text" id="phoneNumber" name="PhoneNumber" class="form-control" placeholder="Introduceți numărul de telefon" required />
-                }
-            </div>
-
-            @* Verificare si afisare sau input pentru Adresa de email *@
-            <div class="form-group">
-                <label for="email">Adresa de email</label>
-                @if (Model.User != null && !string.IsNullOrEmpty(Model.User.Email))
-                {
-                    <p>@Model.User.Email</p>
-                    <input type="hidden" name="Email" value="@Model.User.Email" />
-                }
-                else
-                {
-                    <input type="email" id="email" name="Email" class="form-control" placeholder="Introduceți adresa de email" required />
-                }
-            </div>
-
-
-
-            <div class="form-group">
-                <label for="paymentType">Metoda de plată</label>
-                <select id="paymentType" name="PaymentType" class="form-control" required onchange="updatePaymentDetails()">
-                    <option value="Cash" selected>Numerar</option>
-                    <option value="Card">Card</option>
-                    <option value="Transfer">Transfer bancar</option>
-                </select>
-            </div>
-
-            <div id="paymentDetailsCard" class="form-group d-none">
-                <label for="cardNumber">Număr card</label>
-                <input type="text" id="cardNumber" name="CardNumber" class="form-control" placeholder="Introduceți numărul cardului" />
-
-                <label for="cardHolder">Nume titular card</label>
-                <input type="text" id="cardHolder" name="CardHolder" class="form-control" placeholder="Introduceți numele titularului cardului" />
-
-                <label for="cardExpiration">Dată expirare</label>
-                <input type="text" id="cardExpiration" name="CardExpiration" class="form-control" placeholder="MM/AA" />
-
-                <label for="cardCVV">Cod CVV</label>
-                <input type="text" id="cardCVV" name="CardCVV" class="form-control" placeholder="Introduceți codul CVV" />
-            </div>
-
-            <div id="paymentDetailsTransfer" class="form-group d-none">
-                <label for="bankName">Nume bancă</label>
-                <input type="text" id="bankName" name="BankName" class="form-control" placeholder="Introduceți numele băncii" />
-
-                <label for="accountNumber">Număr cont</label>
-                <input type="text" id="accountNumber" name="AccountNumber" class="form-control" placeholder="Introduceți numărul contului" />
-
-                <label for="iban">IBAN</label>
-                <input type="text" id="iban" name="IBAN" class="form-control" placeholder="Introduceți IBAN-ul" />
-            </div>
-
-            <div class="form-group">
-                <label for="address">Adresa de livrare</label>
-                <textarea id="address" name="Address" class="form-control" rows="3" required placeholder="Introduceți adresa completă pentru livrare"></textarea>
-            </div>
-
-            <input type="hidden" name="CartID" value="@Model.CartID" />
-            <input type="hidden" name="Total" value="@Model.Total" />
-            <input type="hidden" name="Status" value="@Model.Status" />
-
-            <button type="button" class="btn btn-success mt-3" onclick="submitOrder()">Finalizează comanda</button>
-        </form>
+    <!-- First Name -->
+    <div class="form-group">
+        <label for="firstName">
+            <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Prenume
+        </label>
+        @if (Model.User != null && !string.IsNullOrEmpty(Model.User.FirstName))
+        {
+            <p>@Model.User.FirstName</p>
+            <input type="hidden" name="FirstName" value="@Model.User.FirstName" />
+        }
+        else
+        {
+            <input type="text" id="firstName" name="FirstName" class="form-control" placeholder="Introduceți prenumele" required />
+        }
     </div>
-</div>
+
+    <!-- Phone Number -->
+    <div class="form-group">
+        <label for="phoneNumber">
+            <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Număr de telefon
+        </label>
+        @if (Model.User != null && !string.IsNullOrEmpty(Model.User.PhoneNumber))
+        {
+            <p>@Model.User.PhoneNumber</p>
+            <input type="hidden" name="PhoneNumber" value="@Model.User.PhoneNumber" />
+        }
+        else
+        {
+            <input type="text" id="phoneNumber" name="PhoneNumber" class="form-control" placeholder="Introduceți numărul de telefon" required pattern="^\d{10}$" />
+        }
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+        <label for="email">
+            <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Adresa de email
+        </label>
+        @if (Model.User != null && !string.IsNullOrEmpty(Model.User.Email))
+        {
+            <p>@Model.User.Email</p>
+            <input type="hidden" name="Email" value="@Model.User.Email" />
+        }
+        else
+        {
+            <input type="email" id="email" name="Email" class="form-control" placeholder="Introduceți adresa de email" required />
+        }
+    </div>
+
+    <div class="form-group">
+        <label for="paymentType">
+            <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Metoda de plată
+        </label>
+        <select id="paymentType" name="PaymentType" class="form-control" required onchange="updatePaymentDetails()">
+            <option value="Cash" selected>Numerar</option>
+            <option value="Card">Card</option>
+            <option value="Transfer">Transfer bancar</option>
+        </select>
+    </div>
+
+    <div id="paymentDetailsCard" class="form-group d-none">
+        <label for="cardNumber">
+            <i class="fas fa-credit-card validation-icon" data-default-icon="fa-credit-card"></i> Număr card
+        </label>
+        <input type="text" id="cardNumber" name="CardNumber" class="form-control" placeholder="Introduceți numărul cardului" pattern="^\d{16}$" required />
+
+        <label for="cardHolder">
+            <i class="fas fa-user validation-icon" data-default-icon="fa-user"></i> Nume titular card
+        </label>
+        <input type="text" id="cardHolder" name="CardHolder" class="form-control" placeholder="Introduceți numele titularului cardului" required />
+
+        <label for="cardExpiration">
+            <i class="fas fa-calendar-alt validation-icon" data-default-icon="fa-calendar-alt"></i> Dată expirare
+        </label>
+        <input type="text" id="cardExpiration" name="CardExpiration" class="form-control" placeholder="MM/AA" pattern="^(0[1-9]|1[0-2])\/\d{2}$" required />
+
+        <label for="cardCVV">
+            <i class="fas fa-lock validation-icon" data-default-icon="fa-lock"></i> Cod CVV
+        </label>
+        <input type="text" id="cardCVV" name="CardCVV" class="form-control" placeholder="Introduceți codul CVV" pattern="^\d{3}$" required />
+    </div>
+    <div class="form-group">
+        <label for="address">
+            <i class="fas fa-info-circle text-muted validation-icon" data-default-icon="fa-info-circle" data-default-color="text-muted"></i> Adresa de livrare
+        </label>
+        <textarea id="address" name="Address" class="form-control" rows="3" required placeholder="Introduceți adresa completă pentru livrare"></textarea>
+    </div>
+    <div class="form-group">
+        <button type="button" class="btn btn-success mt-3" onclick="validateAndSubmit()">Finalizează comanda</button>
+    </div>
+</form>
 
 <script>
-    function updatePaymentDetails() {
-        const paymentType = document.getElementById("paymentType").value;
+    document.querySelectorAll('input, textarea, select').forEach(field => {
+        field.addEventListener('input', function () {
+            validateField(field);
+        });
+    });
 
-        document.getElementById("paymentDetailsCard").classList.add("d-none");
-        document.getElementById("paymentDetailsTransfer").classList.add("d-none");
-
-        if (paymentType === "Card") {
-            document.getElementById("paymentDetailsCard").classList.remove("d-none");
-        } else if (paymentType === "Transfer") {
-            document.getElementById("paymentDetailsTransfer").classList.remove("d-none");
+    function validateField(field) {
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) {
+            const icon = label.querySelector('.validation-icon');
+            if (!field.value || !field.checkValidity()) {
+                icon.classList.remove(icon.getAttribute("data-default-icon"), icon.getAttribute("data-default-color"));
+                icon.classList.add('fa-exclamation-circle', 'text-danger');
+            } else {
+                icon.className = `fas validation-icon ${icon.getAttribute("data-default-icon")} ${icon.getAttribute("data-default-color") || ""}`;
+            }
         }
     }
-        function submitOrder() {
-        alert("Comanda a fost plasată cu succes!");
-        document.getElementById("finalizeOrderForm").submit();
+
+    function validateAndSubmit() {
+        const form = document.getElementById('finalizeOrderForm');
+        let allValid = true;
+
+        document.querySelectorAll('input[required], textarea[required], select[required]').forEach(field => {
+            validateField(field);
+            if (!field.checkValidity()) {
+                allValid = false;
+            }
+        });
+
+        if (allValid) {
+            alert('Comanda a fost plasată cu succes!');
+            form.submit();
+        } else {
+            alert('Vă rugăm să completați toate câmpurile obligatorii corect.');
+        }
+    }
+
+    function updatePaymentDetails() {
+        document.getElementById("paymentDetailsCard").classList.toggle("d-none", document.getElementById("paymentType").value !== "Card");
     }
 </script>

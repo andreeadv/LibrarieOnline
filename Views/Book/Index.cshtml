@@ -1,5 +1,4 @@
 ﻿@model List<LibrarieOnline.Models.BookModel>
-
 @{
     ViewBag.Title = "Index";
 }
@@ -95,20 +94,26 @@
 
                     <!-- Filtrare -->
                     <div>
-                        <label class="form-label fw-bold">Autor</label>
-                        <input type="text" name="author" class="form-control form-control-sm" placeholder="Autor" value="@ViewBag.Author" />
-                    </div>
-                    <div>
-                        <label class="form-label fw-bold">Categorie</label>
-                        <input type="text" name="category" class="form-control form-control-sm" placeholder="Categorie" value="@ViewBag.Category" />
-                    </div>
-                    <div>
                         <label class="form-label fw-bold">Preț Minim</label>
                         <input type="number" name="minPrice" class="form-control form-control-sm" placeholder="Min" value="@ViewBag.MinPrice" />
                     </div>
                     <div>
                         <label class="form-label fw-bold">Preț Maxim</label>
                         <input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="Max" value="@ViewBag.MaxPrice" />
+                    </div>
+                    <div>
+                        <label class="form-label fw-bold">Autor</label>
+                        <input type="text" name="author" class="form-control form-control-sm" placeholder="Autor" value="@ViewBag.Author" />
+                    </div>
+                    <div>
+                        <label class="form-label fw-bold">Categorie</label>
+                        <select name="category" class="form-select">
+                            <option value="">Selectează</option>
+                            @foreach (var category in ViewBag.Categories)
+                            {
+                                <option value="@category.CategoryID">@category.CategoryName</option>
+                            }
+                        </select>
                     </div>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-success btn-sm">Aplică filtre</button>
@@ -155,7 +160,7 @@
         </div>
     </div>
 </div>
-       
+ 
 
 <!-- Paginare -->
 <div>

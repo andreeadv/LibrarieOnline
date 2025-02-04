@@ -27,7 +27,7 @@ namespace LibrarieOnline.Controllers
         public IActionResult Index()
         {
             var books = _context.Books.Include(b => b.Category).Include(b => b.Comments).AsQueryable();
-
+            ViewBag.Categories = _context.Categories.ToList();
             // Calcularea ratingului mediu pentru fiecare carte
             foreach (var book in books)
             {
