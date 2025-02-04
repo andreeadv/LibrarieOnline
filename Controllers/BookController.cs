@@ -27,7 +27,8 @@ namespace LibrarieOnline.Controllers
         public IActionResult Index()
         {
             var books = _context.Books.Include(b => b.Category).Include(b => b.Comments).AsQueryable();
-            ViewBag.Categories = _context.Categories.ToList();
+            ViewBag.Categories = _context.Categories.ToList(); // Trimitem lista categoriilor la View
+
             // Calcularea ratingului mediu pentru fiecare carte
             foreach (var book in books)
             {
@@ -41,7 +42,7 @@ namespace LibrarieOnline.Controllers
                 }
             }
 
-            // MOTOR DE CĂUTARE
+            // 🔹 MOTOR DE CĂUTARE
             var search = Convert.ToString(HttpContext.Request.Query["search"])?.Trim() ?? "";
             if (!string.IsNullOrEmpty(search))
             {
@@ -55,13 +56,21 @@ namespace LibrarieOnline.Controllers
                 books = books.Where(b => mergedBookIds.Contains(b.BookID));
             }
 
-            // FILTRARE
+            // 🔹 FILTRARE DUPĂ AUTOR
             var author = Convert.ToString(HttpContext.Request.Query["author"])?.Trim();
-            if (!string.IsNullOrEmpty(author)) books = books.Where(b => b.Author.Contains(author));
+            if (!string.IsNullOrEmpty(author))
+            {
+                books = books.Where(b => b.Author.Contains(author));
+            }
 
-            var category = Convert.ToString(HttpContext.Request.Query["category"])?.Trim();
-            if (!string.IsNullOrEmpty(category)) books = books.Where(b => b.Category.CategoryName.Contains(category));
+            // 🔹 FILTRARE DUPĂ CATEGORIE
+            int categoryId;
+            if (int.TryParse(HttpContext.Request.Query["category"], out categoryId) && categoryId > 0)
+            {
+                books = books.Where(b => b.CategoryID == categoryId);
+            }
 
+            // 🔹 FILTRARE DUPĂ PREȚ
             decimal? minPrice = null;
             if (decimal.TryParse(Convert.ToString(HttpContext.Request.Query["minPrice"]), out var parsedMinPrice))
             {
@@ -76,7 +85,7 @@ namespace LibrarieOnline.Controllers
                 books = books.Where(b => b.Price <= maxPrice);
             }
 
-            // SORTARE
+            // 🔹 SORTARE
             var sortBy = Convert.ToString(HttpContext.Request.Query["sortBy"]);
             switch (sortBy)
             {
@@ -86,18 +95,18 @@ namespace LibrarieOnline.Controllers
                 case "author": books = books.OrderBy(b => b.Author); break;
             }
 
-            // PAGINARE
+            // 🔹 PAGINARE
             int _perPage = 8;
             int totalItems = books.Count();
             var currentPage = HttpContext.Request.Query.ContainsKey("page") ? Convert.ToInt32(HttpContext.Request.Query["page"]) : 1;
             var offset = (currentPage - 1) * _perPage;
             var paginatedBooks = books.Skip(offset).Take(_perPage).ToList();
 
-            // ViewBag pentru View
+            // 🔹 ViewBag pentru View
             ViewBag.Books = paginatedBooks;
             ViewBag.SearchString = search;
             ViewBag.Author = author;
-            ViewBag.Category = category;
+            ViewBag.SelectedCategory = categoryId > 0 ? categoryId.ToString() : "";
             ViewBag.MinPrice = minPrice;
             ViewBag.MaxPrice = maxPrice;
             ViewBag.SortBy = sortBy;
@@ -107,7 +116,7 @@ namespace LibrarieOnline.Controllers
             var baseUrl = "/Book/Index/?";
             if (!string.IsNullOrEmpty(search)) baseUrl += $"search={search}&";
             if (!string.IsNullOrEmpty(author)) baseUrl += $"author={author}&";
-            if (!string.IsNullOrEmpty(category)) baseUrl += $"category={category}&";
+            if (categoryId > 0) baseUrl += $"category={categoryId}&";
             if (minPrice.HasValue) baseUrl += $"minPrice={minPrice}&";
             if (maxPrice.HasValue) baseUrl += $"maxPrice={maxPrice}&";
             if (!string.IsNullOrEmpty(sortBy)) baseUrl += $"sortBy={sortBy}&";
@@ -115,6 +124,7 @@ namespace LibrarieOnline.Controllers
             ViewBag.PaginationBaseUrl = baseUrl + "page";
             return View();
         }
+
 
         // Detalii despre o anumită carte
         public IActionResult Details(int bookId)

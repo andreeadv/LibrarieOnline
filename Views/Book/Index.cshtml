@@ -107,11 +107,18 @@
                     </div>
                     <div>
                         <label class="form-label fw-bold">Categorie</label>
-                        <select name="category" class="form-select">
+                        <select name="category" class="form-select" onchange="this.form.submit()">
                             <option value="">Selectează</option>
                             @foreach (var category in ViewBag.Categories)
                             {
-                                <option value="@category.CategoryID">@category.CategoryName</option>
+                                if (ViewBag.SelectedCategory == category.CategoryID.ToString())
+                                {
+                                    <option value="@category.CategoryID" selected>@category.CategoryName</option>
+                                }
+                                else
+                                {
+                                    <option value="@category.CategoryID">@category.CategoryName</option>
+                                }
                             }
                         </select>
                     </div>
